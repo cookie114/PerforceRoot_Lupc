@@ -1,0 +1,14 @@
+--- ./tmp/agg-2.5/Makefile.in.Linux	2011-02-25 11:42:19.000000000 +0800
++++ ./agg-2.5/Makefile.in.Linux	2011-01-25 15:31:45.000000000 +0800
+@@ -1,7 +1,7 @@
+-AGGLIBS= -lagg 
+-AGGCXXFLAGS = -O3 -I/usr/X11R6/include -L/usr/X11R6/lib
+-CXX = g++
+-C = gcc
++AGGLIBS= -lagg -lSDL
++AGGCXXFLAGS = -O3 -EL -mips32 -msoft-float -fPIC -I/home/linux/tools/mips-4.4/mips-linux-gnu/include/SDL -L/home/linux/tools/mips-4.4/mips-linux-gnu/lib
++CXX = mips-linux-gnu-g++
++C = mips-linux-gnu-gcc
+ #CXX = icc
+ LIB = ar cr
+ 

@@ -1,0 +1,13 @@
+diff -Nura ./glib-2.34.2/ltmain.sh ./glib-2.34.2-mod/ltmain.sh
+--- ./glib-2.34.2/ltmain.sh	2012-11-10 11:32:47.000000000 +0800
++++ ./glib-2.34.2-mod/ltmain.sh	2013-02-26 08:43:47.793788740 +0800
+@@ -7077,7 +7077,8 @@
+ 		  ;;
+ 		esac
+ 		else
+-		  eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
++		  func_resolve_sysroot "$deplib"
++		  eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $func_resolve_sysroot_result`
+ 		  test -z "$libdir" && \
+ 		    func_fatal_error "\`$deplib' is not a valid libtool archive"
+ 		  test "$absdir" != "$libdir" && \

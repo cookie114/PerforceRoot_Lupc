@@ -1,0 +1,20 @@
+--- ./tmp/libmad-0.15.1b/fixed.h	2004-02-17 10:02:03.000000000 +0800
++++ ./libmad-0.15.1b/fixed.h	2010-12-01 11:32:43.257865360 +0800
+@@ -305,7 +305,7 @@
+  */
+ #  define MAD_F_MLX(hi, lo, x, y)  \
+     asm ("mult	%2,%3"  \
+-	 : "=l" (lo), "=h" (hi)  \
++	 : "=r" (lo), "=r" (hi)  \
+ 	 : "%r" (x), "r" (y))
+ 
+ # if defined(HAVE_MADD_ASM)
+@@ -320,7 +320,7 @@
+  */
+ #  define MAD_F_ML0(hi, lo, x, y)  \
+     asm ("mult	%2,%3"  \
+-	 : "=l" (lo), "=h" (hi)  \
++	 : "=r" (lo), "=r" (hi)  \
+ 	 : "%r" ((x) >> 12), "r" ((y) >> 16))
+ #  define MAD_F_MLA(hi, lo, x, y)  \
+     asm ("madd16	%2,%3"  \

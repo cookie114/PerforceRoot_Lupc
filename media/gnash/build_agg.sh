@@ -1,0 +1,36 @@
+#!/bin/bash
+
+DEFINE_PACKAGE_CROSS=yes
+DEFINE_PACKAGE_TAR=agg-2.5.tar.gz
+DEFINE_PACKAGE_NAME=agg
+DEFINE_PACKAGE_VERSION=2.5
+DEFINE_PACKAGE_SOURCE=
+
+# For ipkg
+DEFINE_PACKAGE_STABLE=yes
+DEFINE_PACKAGE_PRIORITY=optional
+DEFINE_PACKAGE_DEPENDS=
+DEFINE_PACKAGE_SECTION=Multimedia
+DEFINE_PACKAGE_MAINTAINER="HuayaMicro Software Team"
+DEFINE_PACKAGE_DESCRIPTION="AGG renderer."
+
+DEFINE_LUPC=../..
+. ${DEFINE_LUPC}/build_setting.sh
+
+# For configure
+DEFINE_CONFIGURE_ENV=
+DEFINE_CONFIGURE_CMD="./configure"
+DEFINE_CONFIGURE_FLAGS="--host=${DEFINE_HOST}  "
+
+. ${DEFINE_LUPC}/build_rule.sh source
+
+# patch
+patch -p1 < ${DEFINE_SOURCE}.patch
+
+# compile
+cd ${DEFINE_SOURCE}
+make
+
+# copy libagg.a to ${DEFINE_GCC_PREFIX}/lib
+cp ./src/libagg.a ${DEFINE_GCC_PREFIX}/lib
+

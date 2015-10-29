@@ -1,0 +1,2070 @@
+diff -rNu gst-ffmpeg-0.10.11-old/ext/ffmpeg/Makefile.in gst-ffmpeg-0.10.11-new/ext/ffmpeg/Makefile.in
+--- gst-ffmpeg-0.10.11-old/ext/ffmpeg/Makefile.in	2011-11-29 16:19:38.436984453 +0800
++++ gst-ffmpeg-0.10.11-new/ext/ffmpeg/Makefile.in	2011-11-29 17:54:36.807899856 +0800
+@@ -357,8 +357,8 @@
+ 
+ # 	\
+ # 			  gstffmpegscale.c
+-libgstffmpeg_la_CFLAGS = $(FFMPEG_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS)
+-libgstffmpeg_la_LIBADD = $(FFMPEG_LIBS) $(GST_BASE_LIBS) $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(LIBM) $(WIN32_LIBS) -lz $(BZ2_LIBS)
++libgstffmpeg_la_CFLAGS = $(FFMPEG_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS) -L../../../../.././../Release/h2_27/rootfs/massto/massto_1g/root/usr/local/lib
++libgstffmpeg_la_LIBADD = $(FFMPEG_LIBS) $(GST_BASE_LIBS) $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(LIBM) $(WIN32_LIBS) -lz -laac_dec_mips -lac3_dec_mips -lmp3_dec_mips -ldts_dec_mips -lwma_dec_mips $(BZ2_LIBS)
+ libgstffmpeg_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS) $(DARWIN_LDFLAGS)
+ libgstffmpeg_la_LIBTOOLFLAGS = --tag=disable-static
+ @HAVE_FFMPEG_UNINSTALLED_TRUE@libgstffmpeg_la_DEPENDENCIES = $(FFMPEG_LIBS)
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/aac_dec_api.h gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/aac_dec_api.h
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/aac_dec_api.h	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/aac_dec_api.h	2011-11-29 16:18:45.952463002 +0800
+@@ -0,0 +1,120 @@
++
++#ifndef __AACDECAPI_H__
++#define __AACDECAPI_H__
++
++/* Name of package */
++#define PACKAGE "aacdec"
++/* Version number of package */
++#define VERSION "0.3.1"
++
++
++/* library output formats */
++#define FAAD_FMT_16BIT  1
++#define FAAD_FMT_24BIT  2
++#define FAAD_FMT_32BIT  3
++#define FAAD_FMT_FLOAT  4
++#define FAAD_FMT_FIXED  FAAD_FMT_FLOAT
++#define FAAD_FMT_DOUBLE 5
++
++/* A decode call can eat up to FAAD_MIN_STREAMSIZE bytes per decoded channel,
++   so at least so much bytes per channel should be available in this stream */
++#define FAAD_MIN_STREAMSIZE 768 /* 6144 bits/channel */
++
++enum AacProperty {
++    AAC_GET_SAMPLERATE = 0,
++    AAC_GET_SAMPLES,
++    AAC_GET_FRAMELENGTH,
++    AAC_GET_CHANNELS,
++    AAC_GET_VERSION,
++    AAC_Get_,
++    
++    AAC_SET_MEMCALLBACK = 100,
++    AAC_SET_SAMPLERATE,
++    AAC_SET_CHANNELS,
++    AAC_SET_OUTBUFSIZE,
++    AAC_Set_,
++};
++
++enum AacError {
++    AAC_NOERR = 0,
++    AAC_ERR_GETPROPERTY = -1000,
++    AAC_ERR_SETPROPERTY,
++    AAC_ERR_INIT,
++    AAC_ERR_SYNC,
++    AAC_ERR_,
++};
++
++typedef struct tagAacDecPara {
++    void *faadHandle;
++    int framelength;
++    unsigned char channels;
++    unsigned long samplerate;
++    unsigned char objectType;
++    unsigned char outputFormat;
++    unsigned char downMatrix;
++    unsigned char outputchannels;
++    unsigned char *buffer; //aac stream buffer
++    int bytes_in_buffer;
++    int bytes_out_buffer;
++    unsigned char num_lfe_channels;
++    unsigned int samples;
++    int used;
++    int frame_count;	
++}AacDecPara;
++
++typedef struct tagLyxAACdecMemCb {
++    void *malloccb;
++    void *freecb;
++}LyxAACdecMemCb;
++
++
++/*****************************************************************
++ * hDec 指向AacDecPara结构体, 且要初始化好里面的buffer和bytes_in_buffer,因为初始化时候要用到文件头部信息
++ * bytes_in_buffer的大小一定要大于FAAD_MIN_STREAMSIZE
++ * 返回值表示消耗了多少个buffer中的字节
++ ****************************************************************/
++AacDecPara* aac_dec_init();
++
++void aac_dec_reset(AacDecPara *hDec);
++
++/******************************************************************
++ * hDec  指向AacDecPara结构体
++ * inbuf 指向输入缓冲区
++ * input_size 表示inbuf的大小,单位是字节, 一般来说其最小为FAAD_MIN_STREAMSIZE*8
++ * outbuf 指向输出缓冲区, 要预先分配好, 大小最小为32768字节
++ * used 返回使用了inbuf的大小
++ * 返回值:  AAC_NOERR           正确完成,没有出错
++ *          正数                出错, 号码为faad中标准出错号码
++ *****************************************************************/
++int aac_dec_decode_frame(AacDecPara *hDec, unsigned char *inbuf, int input_size, signed short *outbuf, int *used);
++
++/******************************************************************
++ * hDec 指向LyxAACdecPara结构体
++ *****************************************************************/
++int aac_dec_free(AacDecPara *hDec);
++
++/******************************************************************
++ * hDec     指向AacDecPara结构体
++ * property LYXAAC_Get_Samplerate   取得采样率
++ *          LYXAAC_Get_FrameLength  取得每帧的大小,单位为字节
++ *          AAC_GET_SAMPLES         取得生成了多少个样本, 单位是样本数所占的字节数,一般来说是
++ *                                  sizeof(short),这主要是在decode后取得outbuf的大小
++ * 返回值:  AAC_NOERR               正确返回
++ *          AAC_ERR_GETPROPERTY     出错
++ *****************************************************************/
++int aac_dec_get_property(AacDecPara *hDec, int property, int *value);
++
++
++
++/*****************************************************************
++ * hDec 指向AacDecPara结构体
++ * property LYXAAC_Set_MemCallback  设置自己的malloc和free回调函数, value为指向LyxAACdecMemCb类型的指针
++ *                                  
++ * 返回值:  AAC_NOERR               正确返回
++ *          LYXAAC_ERR_SetProperty  出错
++ ****************************************************************/
++int aac_dec_set_property(AacDecPara *hDec, int property, int value);
++
++
++#endif
++
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/ac3_dec_api.h gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/ac3_dec_api.h
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/ac3_dec_api.h	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/ac3_dec_api.h	2011-11-29 16:18:45.952463002 +0800
+@@ -0,0 +1,130 @@
++#ifndef LIBAC3_DEC_API_H
++#define LIBAC3_DEC_API_H
++
++typedef struct ac3dec_para_s  ac3dec_para_t;
++
++#define PACKAGE "ac3dec"
++#define VERSION "0.4.1"
++
++#define AC3_INBUF_SIZE          (4096*2)
++#define AC3_BLOCK_SIZE          (256)
++#define AC3_MAX_CH              (6)
++
++/* definition of AC3 decoder property */
++enum 
++{
++    AC3_GET_SAMPLERATE = 0,
++    AC3_GET_SAMPLES,
++    AC3_GET_OUTCHNUM,
++    AC3_GET_FRAMECOUNT,
++    AC3_GET_BITRATE,
++    AC3_GET_VERSION
++};
++
++enum
++{
++    AC3_SET_OUTCHNUM = 0,
++    AC3_SET_DEBUGLEVEL,
++};
++
++/* definition of ac3_dec_decode_frame return value */
++enum
++{
++    AC3_NOERR = 0,
++    AC3_ERR_GETPROPERTY,
++    AC3_ERR_SETPROPERTY,
++    AC3_ERR_INPUT,
++    AC3_ERR_CRC1,
++    AC3_ERR_CRC2,
++    AC3_ERR_EXP,
++    AC3_ERR_COEFF,
++    AC3_ERR_SANITY,
++};
++
++/* definition of ac3 decoder DEBUG flag */
++#define AC3_DBG_EXP             (0x0001)
++#define AC3_DBG_BAP             (0x0002)
++#define AC3_DBG_MANT            (0x0004)
++#define AC3_DBG_DMX             (0x0008)
++#define AC3_DBG_PCM             (0x0010)
++
++
++/*********************************************************************
++* Description
++*   Function: ac3_dec_sync
++* Parameters
++*   inbuf :        (input) Input buffer addrsss
++*   pos :          (output) Point to the sync word in current frame
++*   sample_rate :  (output) Returns the sample_rate of current frame
++* Returns
++*   returns the framesize of current AC3 frame                     
++*********************************************************************/
++int   ac3_dec_sync(unsigned char *inbuf, int length, int *pos, unsigned int *sample_rate, int *framesize);
++
++/***********************************************************
++* Description
++*   malloc memory for ac3dec_para_t and return the pointer
++* Returns
++*   returns pointer to ac3dec_para_t                    
++***********************************************************/
++ac3dec_para_t*  ac3_dec_init();
++
++/***********************************************************
++* Description
++*   reset AC3 decode
++* Parameters
++*   ac3dec :  (modified) Pointer to ac3dec_para_t struct
++* Returns
++*   void
++***********************************************************/
++void  ac3_dec_reset(ac3dec_para_t *ac3dec);
++
++/***********************************************************
++* Description
++*   Decode one frame of AC3 bitstream
++* Parameters
++*   ac3dec : (modified)	Point to ac3dec_para_t structure
++*   inbuf  : (input)	Input buffer addrsss
++*   input_size : (input) Avaiable data length of input buffer
++*   outbuf :  (output) Output buffer address
++*   used   : (output) Number of bytes in input buffer which has been used to decode current frame.
++* Returns
++*   returns AC3_NOERR if successful. Otherwise an errorcode is returned.
++***********************************************************/
++int    ac3_dec_decode_frame(ac3dec_para_t *ac3dec, unsigned char *inbuf, int input_size, signed short *outbuf, int *used);
++
++/***********************************************************
++* Description
++*   free memory which was malloced in init routine
++* Parameters
++*   ac3dec : (input) Point to ac3dec_para_t structure
++* Returns
++*   void
++***********************************************************/
++void   ac3_dec_free(ac3dec_para_t *ac3dec);
++
++/***********************************************************
++* Description
++*   Get one property from AC3 decoder
++* Parameters
++*   ac3dec : (modified)	Point to ac3dec_para_t structure
++*   property   : (input) Property to get
++*   value : (output) Returns property's value
++* Returns
++*   returns AC3_NOERR if successful. Otherwise AC3_ERR_GETPROPERTY is returned.
++***********************************************************/
++int    ac3_dec_get_property(ac3dec_para_t *ac3dec, int property, int *value);
++
++/***********************************************************
++* Description
++*   Set one property to AC3 decoder
++* Parameters
++*   ac3dec : (modified)	Point to ac3dec_para_t structure
++*   property   : (input) Property to get
++*   value : (input) value to set the property
++* Returns
++*   returns AC3_NOERR if successful. Otherwise AC3_ERR_SETPROPERTY is returned.
++***********************************************************/
++int    ac3_dec_set_property(ac3dec_para_t *ac3dec, int property, int value);
++
++#endif /*LIBAC3_DEC_API_H*/
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/dts_dec_api.h gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/dts_dec_api.h
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/dts_dec_api.h	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/dts_dec_api.h	2011-11-29 16:18:45.945381011 +0800
+@@ -0,0 +1,116 @@
++/*
++ * dca.h
++ * Copyright (C) 2004 Gildas Bazin <gbazin@videolan.org>
++ *
++ * This file is part of libdca, a free DTS Coherent Acoustics stream decoder.
++ * See http://www.videolan.org/developers/libdca.html for updates.
++ *
++ * libdca is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * libdca is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the
++ * Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++#ifndef LIBDCA_DCA_H
++#define LIBDCA_DCA_H
++
++typedef signed char int8_t;
++typedef signed short int16_t;
++typedef signed int int32_t;
++#ifdef WIN32
++typedef signed __int64 int64_t;
++#else
++typedef signed long long int64_t;
++#endif
++typedef signed int intptr_t;
++
++typedef unsigned char uint8_t;
++typedef unsigned short uint16_t;
++typedef unsigned int uint32_t;
++#ifdef WIN32
++typedef unsigned __int64 uint64_t;
++#else
++typedef unsigned long long uint64_t;
++#endif
++typedef unsigned int uintptr_t;
++
++
++/* config */
++
++/* Name of package */
++#define PACKAGE "dts decoder"
++
++/* Version number of package */
++#define VERSION "0.4.0"
++
++/* Define as `__inline' if that's what the C compiler calls it, or to nothing
++   if it is not supported. */
++#define inline __inline
++
++/* Define as `__restrict' if that's what the C compiler calls it, or to
++   nothing if it is not supported. */
++#define restrict __restrict
++
++#ifdef FIX_POINT
++typedef int32_t sample_t;
++typedef int32_t level_t;
++#else
++typedef float sample_t;
++typedef float level_t;
++#endif
++
++typedef struct dca_state_s dca_state_t;
++
++//#define BUFFER_SIZE 24576
++#define BUFFER_SIZE 4096*4
++
++
++
++/* DTS Decoder return value */
++#define DTS_NOERR                      (0)
++#define DTS_ERR_SYNC                   (DTS_NOERR + 1)
++#define DTS_ERR_INPUTDATA              (DTS_ERR_SYNC+1)
++#define DTS_ERR_SETPROPERTY            (DTS_ERR_INPUTDATA+1)
++#define DTS_ERR_GETPROPERTY            (DTS_ERR_SETPROPERTY+1)
++#define DTS_ERR_QUAN                   (DTS_ERR_GETPROPERTY+1)
++#define DTS_ERR_SUBFRAME               (DTS_ERR_QUAN+1)
++#define DTS_ERR_BITALLOC               (DTS_ERR_SUBFRAME+1)
++#define DTS_ERR_OUTPUT                 (DTS_ERR_BITALLOC+1)
++
++
++#define DTS_SET_BIAS                   (0)
++#define DTS_SET_LEVEL                  (DTS_SET_BIAS +1)
++#define DTS_SET_FLAGS                  (DTS_SET_LEVEL+1)
++#define DTS_SET_DYNRNG                 (DTS_SET_FLAGS+1)
++#define DTS_SET_ADJUST                 (DTS_SET_DYNRNG+1)
++#define DTS_SET_GAIN                   (DTS_SET_ADJUST+1)
++#define DTS_SET_FRAMELEN               (DTS_SET_GAIN+1)
++
++enum    
++{
++    DTS_GET_SAMPLES,
++    DTS_GET_VERSION
++};
++
++#define DTS_BLOCK_SIZE               256
++#define DTS_MAX_CH                     6
++
++int dts_dec_sync (uint8_t * buf, int buf_size, int *pos, int * sample_rate);
++int dts_dec_set_property(dca_state_t *state, int property, int value);
++int dts_dec_get_property(dca_state_t *state, int property, int* value);
++dca_state_t * dts_dec_init();
++void dts_dec_reset(dca_state_t *state);
++int  dts_dec_decode_frame(dca_state_t *state, uint8_t *inbuf, int input_size, int16_t *outbuf, int *used);
++void dts_dec_free(dca_state_t *state);
++
++#endif /* LIBDCA_DCA_H */
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_aac.c gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_aac.c
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_aac.c	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_aac.c	2011-11-29 16:18:45.952463002 +0800
+@@ -0,0 +1,199 @@
++/*
++ * AAC decoder
++ * Copyright (c) 2005-2006 Oded Shimon ( ods15 ods15 dyndns org )
++ * Copyright (c) 2006-2007 Maxim Gavrilov ( maxim.gavrilov gmail com )
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * AAC decoder
++ * @author Oded Shimon  ( ods15 ods15 dyndns org )
++ * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
++ */
++
++/*
++ * supported tools
++ *
++ * Support?             Name
++ * N (code in SoC repo) gain control
++ * Y                    block switching
++ * Y                    window shapes - standard
++ * N                    window shapes - Low Delay
++ * Y                    filterbank - standard
++ * N (code in SoC repo) filterbank - Scalable Sample Rate
++ * Y                    Temporal Noise Shaping
++ * N (code in SoC repo) Long Term Prediction
++ * Y                    intensity stereo
++ * Y                    channel coupling
++ * Y                    frequency domain prediction
++ * Y                    Perceptual Noise Substitution
++ * Y                    Mid/Side stereo
++ * N                    Scalable Inverse AAC Quantization
++ * N                    Frequency Selective Switch
++ * N                    upsampling filter
++ * Y                    quantization & coding - AAC
++ * N                    quantization & coding - TwinVQ
++ * N                    quantization & coding - BSAC
++ * N                    AAC Error Resilience tools
++ * N                    Error Resilience payload syntax
++ * N                    Error Protection tool
++ * N                    CELP
++ * N                    Silence Compression
++ * N                    HVXC
++ * N                    HVXC 4kbits/s VR
++ * N                    Structured Audio tools
++ * N                    Structured Audio Sample Bank Format
++ * N                    MIDI
++ * N                    Harmonic and Individual Lines plus Noise
++ * N                    Text-To-Speech Interface
++ * Y                    Spectral Band Replication
++ * Y (not in this code) Layer-1
++ * Y (not in this code) Layer-2
++ * Y (not in this code) Layer-3
++ * N                    SinuSoidal Coding (Transient, Sinusoid, Noise)
++ * N (planned)          Parametric Stereo
++ * N                    Direct Stream Transfer
++ *
++ * Note: - HE AAC v1 comprises LC AAC with Spectral Band Replication.
++ *       - HE AAC v2 comprises LC AAC with Spectral Band Replication and
++           Parametric Stereo.
++ */
++
++
++#include "avcodec.h"
++#include "internal.h"
++#include "get_bits.h"
++#include "dsputil.h"
++#include "fft.h"
++#include "lpc.h"
++
++#include "aac.h"
++#include "aactab.h"
++#include "aacdectab.h"
++#include "cbrt_tablegen.h"
++#include "sbr.h"
++#include "aacsbr.h"
++#include "mpeg4audio.h"
++#include "aac_parser.h"
++#include "aac_dec_api.h"
++
++#include <assert.h>
++#include <errno.h>
++#include <math.h>
++#include <string.h>
++
++AacDecPara  *aacPara;
++
++static av_cold int aac_decode_init(AVCodecContext *avccontext)
++{
++    AACContext *ac = avccontext->priv_data;
++    int i;
++    unsigned char *version;
++    LyxAACdecMemCb memcb;
++
++    memcb.malloccb = av_malloc;
++    memcb.freecb = av_free;
++    aac_dec_set_property(NULL, AAC_SET_MEMCALLBACK, &memcb);
++    aacPara = aac_dec_init();
++    if(aacPara == NULL)
++        g_print("aac_dec_init failed!\n");
++
++    aac_dec_get_property(NULL, AAC_GET_VERSION, &version);
++    g_print("%s\n", version);
++
++    aac_dec_reset(aacPara);
++    aac_dec_set_property(aacPara, AAC_SET_SAMPLERATE, 48000);
++    aac_dec_set_property(aacPara, AAC_SET_CHANNELS, 2);
++    aac_dec_set_property(aacPara, AAC_SET_OUTBUFSIZE, 2048*MAX_CHANNELS*sizeof(int16_t));     
++
++    //ac->avccontext = avccontext;
++    //ac->m4ac.sample_rate = avccontext->sample_rate;
++
++    //if (avccontext->extradata_size > 0) {
++    //    if (decode_audio_specific_config(ac, avccontext->extradata, avccontext->extradata_size))
++    //        return -1;
++    //}
++
++    avccontext->sample_fmt = SAMPLE_FMT_S16;
++
++    return 0;
++}
++
++static int aac_decode_frame(AVCodecContext *avccontext, void *data,
++                            int *data_size, AVPacket *avpkt)
++{
++    const uint8_t *buf = avpkt->data;
++    int buf_size = avpkt->size;
++    AACContext *ac = avccontext->priv_data;
++    int data_size_tmp;
++    int buf_consumed;
++    int samples = 1024;
++    int ret;
++
++    //g_print("entering aac_decode_frame, input size %d\n", buf_size);
++
++    // use optimized codec
++    ret = aac_dec_decode_frame(aacPara, buf, buf_size, data, &buf_consumed);
++    if(ret > 0)
++    {
++        g_print("aac_dec_decode_frame error , return %d\n", ret);
++        return -1;
++    }
++
++    aac_dec_get_property(aacPara, AAC_GET_SAMPLES, &samples);
++    aac_dec_get_property(aacPara, AAC_GET_CHANNELS, &(avccontext->channels));
++
++    data_size_tmp = samples * avccontext->channels * sizeof(int16_t);
++    if (*data_size < data_size_tmp) {
++        av_log(avccontext, AV_LOG_ERROR,
++               "Output buffer too small (%d) or trying to output too many samples (%d) for this frame.\n",
++               *data_size, data_size_tmp);
++        return -1;
++    }
++    *data_size = data_size_tmp;
++
++    return buf_consumed;
++
++}
++
++static av_cold int aac_decode_close(AVCodecContext *avccontext)
++{
++    AACContext *ac = avccontext->priv_data;
++    int i, type;
++
++    aac_dec_free(aacPara);
++
++    return 0;
++}
++
++AVCodec aac_decoder = {
++    "aac",
++    AVMEDIA_TYPE_AUDIO,
++    CODEC_ID_AAC,
++    sizeof(AACContext),
++    aac_decode_init,
++    NULL,
++    aac_decode_close,
++    aac_decode_frame,
++    .long_name = NULL_IF_CONFIG_SMALL("Advanced Audio Coding"),
++    .sample_fmts = (const enum SampleFormat[]) {
++        SAMPLE_FMT_S16,SAMPLE_FMT_NONE
++    },
++    .channel_layouts = aac_channel_layout,
++};
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_ac3dec.c gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_ac3dec.c
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_ac3dec.c	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_ac3dec.c	2011-11-29 16:18:45.952463002 +0800
+@@ -0,0 +1,167 @@
++/*
++ * AC-3 Audio Decoder
++ * This code was developed as part of Google Summer of Code 2006.
++ * E-AC-3 support was added as part of Google Summer of Code 2007.
++ *
++ * Copyright (c) 2006 Kartikey Mahendra BHATT (bhattkm at gmail dot com)
++ * Copyright (c) 2007-2008 Bartlomiej Wolowiec <bartek.wolowiec@gmail.com>
++ * Copyright (c) 2007 Justin Ruggles <justin.ruggles@gmail.com>
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include <stdio.h>
++#include <stddef.h>
++#include <math.h>
++#include <string.h>
++
++#include "libavutil/crc.h"
++#include "internal.h"
++#include "aac_ac3_parser.h"
++#include "ac3_parser.h"
++#include "ac3dec.h"
++#include "ac3dec_data.h"
++#include "ac3_dec_api.h"
++
++ac3dec_para_t  *g_ac3_para;
++
++
++/**
++ * AVCodec initialization
++ */
++static av_cold int ac3_decode_init(AVCodecContext *avctx)
++{
++    AC3DecodeContext *s = avctx->priv_data;
++    s->avctx = avctx;
++    unsigned char *version;
++
++    g_ac3_para = ac3_dec_init();
++    if(g_ac3_para == NULL)
++        g_print("ac3 decoder init failed!\n");
++
++    ac3_dec_reset(g_ac3_para);
++
++    ac3_dec_get_property(g_ac3_para, AC3_GET_VERSION, &version);
++    g_print("%s\n", version);    
++
++    /* allow downmixing to stereo or mono */
++    if (avctx->channels > 0 && avctx->request_channels > 0 &&
++            avctx->request_channels < avctx->channels &&
++            avctx->request_channels <= 2) {
++        avctx->channels = avctx->request_channels;
++    }
++
++    avctx->sample_fmt = SAMPLE_FMT_S16;
++
++    return 0;
++}
++
++/**
++ * Downmix the output to mono or stereo.
++ */
++void ff_ac3_downmix_c(float (*samples)[256], float (*matrix)[2], int out_ch, int in_ch, int len)
++{
++    int i, j;
++    float v0, v1;
++    if(out_ch == 2) {
++        for(i=0; i<len; i++) {
++            v0 = v1 = 0.0f;
++            for(j=0; j<in_ch; j++) {
++                v0 += samples[j][i] * matrix[j][0];
++                v1 += samples[j][i] * matrix[j][1];
++            }
++            samples[0][i] = v0;
++            samples[1][i] = v1;
++        }
++    } else if(out_ch == 1) {
++        for(i=0; i<len; i++) {
++            v0 = 0.0f;
++            for(j=0; j<in_ch; j++)
++                v0 += samples[j][i] * matrix[j][0];
++            samples[0][i] = v0;
++        }
++    }
++}
++
++
++/**
++ * Decode a single AC-3 frame.
++ */
++static int ac3_decode_frame(AVCodecContext * avctx, void *data, int *data_size,
++                            AVPacket *avpkt)
++{
++    const uint8_t *buf = avpkt->data;
++    int buf_size = avpkt->size;
++    AC3DecodeContext *s = avctx->priv_data;
++    const uint8_t *channel_map;
++    int used, ret;
++
++    // use optimized ac3 decoder
++    ret = ac3_dec_decode_frame(g_ac3_para, buf, buf_size, data, &used);
++    if(ret != AC3_NOERR)
++    {
++        g_print("ac3_dec_decode_frame error %d, inputsize %d, consumed %d\n", ret, buf_size, used);
++        ac3_dec_reset(g_ac3_para);
++        used = buf_size;
++    }
++	else
++	{
++	    ac3_dec_get_property(g_ac3_para, AC3_GET_SAMPLERATE, &(avctx->sample_rate));
++		ac3_dec_get_property(g_ac3_para, AC3_GET_OUTCHNUM, &(avctx->channels));
++	}
++
++    *data_size = AC3_BLOCK_SIZE * 6 * 2 * sizeof(int16_t);
++
++    return used;
++
++}
++
++/**
++ * Uninitialize the AC-3 decoder.
++ */
++static av_cold int ac3_decode_end(AVCodecContext *avctx)
++{
++    AC3DecodeContext *s = avctx->priv_data;
++
++    ac3_dec_free(g_ac3_para);
++
++    return 0;
++}
++
++AVCodec ac3_decoder = {
++    .name = "ac3",
++    .type = AVMEDIA_TYPE_AUDIO,
++    .id = CODEC_ID_AC3,
++    .priv_data_size = sizeof (AC3DecodeContext),
++    .init = ac3_decode_init,
++    .close = ac3_decode_end,
++    .decode = ac3_decode_frame,
++    .long_name = NULL_IF_CONFIG_SMALL("ATSC A/52A (AC-3)"),
++};
++
++#if CONFIG_EAC3_DECODER
++AVCodec eac3_decoder = {
++    .name = "eac3",
++    .type = AVMEDIA_TYPE_AUDIO,
++    .id = CODEC_ID_EAC3,
++    .priv_data_size = sizeof (AC3DecodeContext),
++    .init = ac3_decode_init,
++    .close = ac3_decode_end,
++    .decode = ac3_decode_frame,
++    .long_name = NULL_IF_CONFIG_SMALL("ATSC A/52B (AC-3, E-AC-3)"),
++};
++#endif
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_dtsdec.c gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_dtsdec.c
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_dtsdec.c	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_dtsdec.c	2011-11-29 16:18:45.979838124 +0800
+@@ -0,0 +1,269 @@
++/*
++ * DCA compatible decoder
++ * Copyright (C) 2004 Gildas Bazin
++ * Copyright (C) 2004 Benjamin Zores
++ * Copyright (C) 2006 Benjamin Larsson
++ * Copyright (C) 2007 Konstantin Shishkov
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include <math.h>
++#include <stddef.h>
++#include <stdio.h>
++
++#include "libavutil/intmath.h"
++#include "libavutil/intreadwrite.h"
++#include "avcodec.h"
++#include "dsputil.h"
++#include "fft.h"
++#include "get_bits.h"
++#include "put_bits.h"
++#include "dcadata.h"
++#include "dcahuff.h"
++#include "dca.h"
++#include "synth_filter.h"
++#include "dcadsp.h"
++
++#include "dts_dec_api.h"
++
++//#define TRACE
++
++#define DCA_PRIM_CHANNELS_MAX (5)
++#define DCA_SUBBANDS (32)
++#define DCA_ABITS_MAX (32)      /* Should be 28 */
++#define DCA_SUBSUBFAMES_MAX (4)
++#define DCA_LFE_MAX (3)
++
++enum DCAMode {
++    DCA_MONO = 0,
++    DCA_CHANNEL,
++    DCA_STEREO,
++    DCA_STEREO_SUMDIFF,
++    DCA_STEREO_TOTAL,
++    DCA_3F,
++    DCA_2F1R,
++    DCA_3F1R,
++    DCA_2F2R,
++    DCA_3F2R,
++    DCA_4F2R
++};
++
++
++#define DCA_LFE 0x80
++
++#define DCA_MAX_FRAME_SIZE 16384
++
++
++typedef struct {
++    AVCodecContext *avctx;
++    /* Frame header */
++    int frame_type;             ///< type of the current frame
++    int samples_deficit;        ///< deficit sample count
++    int crc_present;            ///< crc is present in the bitstream
++    int sample_blocks;          ///< number of PCM sample blocks
++    int frame_size;             ///< primary frame byte size
++    int amode;                  ///< audio channels arrangement
++    int sample_rate;            ///< audio sampling rate
++    int bit_rate;               ///< transmission bit rate
++    int bit_rate_index;         ///< transmission bit rate index
++
++    int downmix;                ///< embedded downmix enabled
++    int dynrange;               ///< embedded dynamic range flag
++    int timestamp;              ///< embedded time stamp flag
++    int aux_data;               ///< auxiliary data flag
++    int hdcd;                   ///< source material is mastered in HDCD
++    int ext_descr;              ///< extension audio descriptor flag
++    int ext_coding;             ///< extended coding flag
++    int aspf;                   ///< audio sync word insertion flag
++    int lfe;                    ///< low frequency effects flag
++    int predictor_history;      ///< predictor history flag
++    int header_crc;             ///< header crc check bytes
++    int multirate_inter;        ///< multirate interpolator switch
++    int version;                ///< encoder software revision
++    int copy_history;           ///< copy history
++    int source_pcm_res;         ///< source pcm resolution
++    int front_sum;              ///< front sum/difference flag
++    int surround_sum;           ///< surround sum/difference flag
++    int dialog_norm;            ///< dialog normalisation parameter
++
++    /* Primary audio coding header */
++    int subframes;              ///< number of subframes
++    int total_channels;         ///< number of channels including extensions
++    int prim_channels;          ///< number of primary audio channels
++    int subband_activity[DCA_PRIM_CHANNELS_MAX];    ///< subband activity count
++    int vq_start_subband[DCA_PRIM_CHANNELS_MAX];    ///< high frequency vq start subband
++    int joint_intensity[DCA_PRIM_CHANNELS_MAX];     ///< joint intensity coding index
++    int transient_huffman[DCA_PRIM_CHANNELS_MAX];   ///< transient mode code book
++    int scalefactor_huffman[DCA_PRIM_CHANNELS_MAX]; ///< scale factor code book
++    int bitalloc_huffman[DCA_PRIM_CHANNELS_MAX];    ///< bit allocation quantizer select
++    int quant_index_huffman[DCA_PRIM_CHANNELS_MAX][DCA_ABITS_MAX]; ///< quantization index codebook select
++    float scalefactor_adj[DCA_PRIM_CHANNELS_MAX][DCA_ABITS_MAX];   ///< scale factor adjustment
++
++    /* Primary audio coding side information */
++    int subsubframes;           ///< number of subsubframes
++    int partial_samples;        ///< partial subsubframe samples count
++    int prediction_mode[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS];    ///< prediction mode (ADPCM used or not)
++    int prediction_vq[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS];      ///< prediction VQ coefs
++    int bitalloc[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS];           ///< bit allocation index
++    int transition_mode[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS];    ///< transition mode (transients)
++    int scale_factor[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][2];    ///< scale factors (2 if transient)
++    int joint_huff[DCA_PRIM_CHANNELS_MAX];                       ///< joint subband scale factors codebook
++    int joint_scale_factor[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS]; ///< joint subband scale factors
++    int downmix_coef[DCA_PRIM_CHANNELS_MAX][2];                  ///< stereo downmix coefficients
++    int dynrange_coef;                                           ///< dynamic range coefficient
++
++    int high_freq_vq[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS];       ///< VQ encoded high frequency subbands
++
++    float lfe_data[2 * DCA_SUBSUBFAMES_MAX * DCA_LFE_MAX *
++                   2 /*history */ ];    ///< Low frequency effect data
++    int lfe_scale_factor;
++
++    /* Subband samples history (for ADPCM) */
++    float subband_samples_hist[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][4];
++    DECLARE_ALIGNED(16, float, subband_fir_hist)[DCA_PRIM_CHANNELS_MAX][512];
++    DECLARE_ALIGNED(16, float, subband_fir_noidea)[DCA_PRIM_CHANNELS_MAX][32];
++    int hist_index[DCA_PRIM_CHANNELS_MAX];
++    DECLARE_ALIGNED(16, float, raXin)[32];
++
++    int output;                 ///< type of output
++    float add_bias;             ///< output bias
++    float scale_bias;           ///< output scale
++
++    DECLARE_ALIGNED(16, float, samples)[1536];  /* 6 * 256 = 1536, might only need 5 */
++    const float *samples_chanptr[6];
++
++    uint8_t dca_buffer[DCA_MAX_FRAME_SIZE];
++    int dca_buffer_size;        ///< how much data is in the dca_buffer
++
++    const int8_t* channel_order_tab;                             ///< channel reordering table, lfe and non lfe
++    GetBitContext gb;
++    /* Current position in DCA frame */
++    int current_subframe;
++    int current_subsubframe;
++
++    int debug_flag;             ///< used for suppressing repeated error messages output
++    DSPContext dsp;
++    FFTContext imdct;
++    SynthFilterContext synth;
++    DCADSPContext dcadsp;
++} DCAContext;
++
++
++dca_state_t *g_dts_para;
++
++
++/**
++ * Main frame decoding function
++ * FIXME add arguments
++ */
++static int dca_decode_frame(AVCodecContext * avctx,
++                            void *data, int *data_size,
++                            AVPacket *avpkt)
++{
++    const uint8_t *buf = avpkt->data;
++    int buf_size = avpkt->size;
++
++    int i;
++    int16_t *samples = data;
++    DCAContext *s = avctx->priv_data;
++    int channels;
++    int length, pos, sample_rate;
++    int ret, used, out_size;
++
++    //g_print("input size %d\n", buf_size);
++
++    //length = dts_dec_sync(buf, buf_size, &pos, &sample_rate);
++    //if(!length)
++    //    g_print("dts_dec_sync error, ret = %d\n", length);
++    length = buf_size;
++    dts_dec_set_property(g_dts_para, DTS_SET_FRAMELEN, length);
++    dts_dec_set_property(g_dts_para, DTS_SET_BIAS, 0);
++    dts_dec_set_property(g_dts_para, DTS_SET_LEVEL, 1);
++    dts_dec_set_property(g_dts_para, DTS_SET_FLAGS, 2);
++
++
++    used = 0;
++    out_size = 0;
++    while(!used)
++    {
++        ret = dts_dec_decode_frame(g_dts_para, buf, buf_size, (data+out_size), &used);
++        if(ret != DTS_NOERR)
++            g_print("dts_dec_decode_frame error, ret = %d\n", ret);
++
++        out_size += 2 * 2 * DTS_BLOCK_SIZE;
++    }
++    
++    *data_size = out_size;
++
++    avctx->channel_layout = CH_LAYOUT_STEREO;
++    //avctx->bit_rate = 1536000;
++
++    //g_print("channel %d, sample rate %d, bit rate %d\n", avctx->channels, avctx->sample_rate, avctx->bit_rate);
++    //g_print("input size %d, out_size = %d, consumed = %d\n", buf_size, out_size, used);
++
++    return used;
++
++}
++
++
++
++/**
++ * DCA initialization
++ *
++ * @param avctx     pointer to the AVCodecContext
++ */
++
++static av_cold int dca_decode_init(AVCodecContext * avctx)
++{
++    DCAContext *s = avctx->priv_data;
++    int i;
++    char *version;
++
++    g_dts_para = dts_dec_init();
++
++    dts_dec_get_property(g_dts_para, DTS_GET_VERSION, &version);
++    g_print("%s\n", version);
++
++    dts_dec_reset(g_dts_para);
++
++    avctx->channels = 2;
++    avctx->request_channels = 2;
++    avctx->sample_fmt = SAMPLE_FMT_S16;
++
++    g_print("sample rate = %d\n", avctx->sample_rate);
++
++    return 0;
++
++}
++
++static av_cold int dca_decode_end(AVCodecContext * avctx)
++{
++    dts_dec_free(g_dts_para);
++    return 0;    
++}
++
++AVCodec dca_decoder = {
++    .name = "dca",
++    .type = AVMEDIA_TYPE_AUDIO,
++    .id = CODEC_ID_DTS,
++    .priv_data_size = sizeof(DCAContext),
++    .init = dca_decode_init,
++    .decode = dca_decode_frame,
++    .close = dca_decode_end,
++    .long_name = NULL_IF_CONFIG_SMALL("DCA (DTS Coherent Acoustics)"),
++};
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_mp3dec.c gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_mp3dec.c
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_mp3dec.c	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_mp3dec.c	2011-11-29 16:18:45.979838124 +0800
+@@ -0,0 +1,224 @@
++/*
++ * MPEG Audio decoder
++ * Copyright (c) 2001, 2002 Fabrice Bellard
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * MPEG Audio decoder.
++ */
++
++#include "avcodec.h"
++#include "get_bits.h"
++#include "dsputil.h"
++
++/*
++ * TODO:
++ *  - in low precision mode, use more 16 bit multiplies in synth filter
++ *  - test lsf / mpeg25 extensively.
++ */
++
++#include "mpegaudio.h"
++#include "mpegaudiodecheader.h"
++
++#include "mathops.h"
++
++#include "mp3_dec_api.h"
++
++/* WARNING: only correct for posititive numbers */
++#define FIXR(a)   ((int)((a) * FRAC_ONE + 0.5))
++#define FRAC_RND(a) (((a) + (FRAC_ONE/2)) >> FRAC_BITS)
++
++#define FIXHR(a) ((int)((a) * (1LL<<32) + 0.5))
++
++/****************/
++
++#define HEADER_SIZE 4
++
++#include "mpegaudiodata.h"
++#include "mpegaudiodectab.h"
++
++#define  INPUT_SIZE      4096
++
++mp3dec_para_t  *g_mp3_para;
++unsigned char in_buf[INPUT_SIZE];
++int           data_len;
++
++
++/* computed from band_size_long */
++#include "mpegaudio_tablegen.h"
++
++
++DECLARE_ALIGNED(16, MPA_INT, ff_mpa_synth_window)[512];
++
++
++static av_cold int mp3_decode_init(AVCodecContext * avctx)
++{
++    MPADecodeContext *s = avctx->priv_data;
++    static int init=0;
++    int i, j, k;
++    unsigned char *version;
++
++    g_print("entering decode_init, sample rate %d\n", avctx->sample_rate);
++
++    mp3_dec_set_property(NULL, MP3_SET_MALLOC, av_malloc);
++    mp3_dec_set_property(NULL, MP3_SET_FREE, av_free);
++    mp3_dec_set_property(NULL, MP3_SET_MEMSET, memset);
++    mp3_dec_set_property(NULL, MP3_SET_MEMCOPY, memcpy);
++    mp3_dec_set_property(NULL, MP3_SET_MEMMOVE, memmove);
++
++    g_mp3_para = mp3_dec_init();
++
++    mp3_dec_get_property(g_mp3_para, MP3_GET_VERSION, &version);
++    g_print("%s\n", version);
++
++    mp3_dec_reset(g_mp3_para);
++
++    data_len = 0;
++
++    avctx->sample_fmt = SAMPLE_FMT_S16;
++
++    return 0;
++    
++
++}
++
++
++
++static av_cold int mp3_decode_close(AVCodecContext *avctx)
++{
++    mp3_dec_free(g_mp3_para);
++
++    return 0;
++}
++
++
++static int mp3_decode_frame(AVCodecContext * avctx,
++                        void *data, int *data_size,
++                        AVPacket *avpkt)
++{
++    const uint8_t *buf = avpkt->data;
++    int buf_size = avpkt->size;
++    MPADecodeContext *s = avctx->priv_data;
++    uint32_t header;
++    int out_size;
++    OUT_INT *out_samples = data;
++    int  used, ret, samples, channels;
++    int  consumed, samplerate;
++
++    if(data_len + buf_size < INPUT_SIZE)
++    {
++        memcpy(&in_buf[data_len], buf, buf_size);
++        data_len += buf_size;
++        consumed = buf_size;
++    }
++    else
++    {
++        g_print("Input buffer not enough!, data_len %d, buf_size %d\n", data_len, buf_size);
++        return -1;
++    }
++
++    //g_print("data_len = %d\n", data_len);
++
++    ret = mp3_dec_decode_frame(g_mp3_para, in_buf, data_len, data, &used);
++    if(ret != MAD_ERROR_NONE)
++    {
++        g_print("mp3_dec_decode_frame error, ret %d\n", ret);
++        return -1;
++    }
++
++    data_len -= used;
++    memmove(in_buf, &in_buf[used], data_len);
++    
++    mp3_dec_get_property(g_mp3_para, MP3_GET_SAMPLES, &samples);
++    mp3_dec_get_property(g_mp3_para, MP3_GET_OUTCHNUM, &channels);
++    mp3_dec_get_property(g_mp3_para, MP3_GET_SAMPLERATE, &samplerate);
++
++    avctx->sample_rate = samplerate;    
++    avctx->channels = channels;
++
++    //g_print("samples %d, channels %d, sample rate %d\n", samples, channels, samplerate);
++
++    *data_size = (samples*channels*sizeof(short));
++
++    return consumed;
++
++    
++
++
++}
++
++
++static void flush(AVCodecContext *avctx){
++    MPADecodeContext *s = avctx->priv_data;
++    memset(s->synth_buf, 0, sizeof(s->synth_buf));
++    s->last_buf_size= 0;
++}
++
++
++
++#if CONFIG_MP1_DECODER
++AVCodec mp1_decoder =
++{
++    "mp1",
++    AVMEDIA_TYPE_AUDIO,
++    CODEC_ID_MP1,
++    sizeof(MPADecodeContext),
++    mp3_decode_init,
++    NULL,
++    mp3_decode_close,
++    mp3_decode_frame,
++    CODEC_CAP_PARSE_ONLY,
++    .flush= flush,
++    .long_name= NULL_IF_CONFIG_SMALL("MP1 (MPEG audio layer 1)"),
++};
++#endif
++#if CONFIG_MP2_DECODER
++AVCodec mp2_decoder =
++{
++    "mp2",
++    AVMEDIA_TYPE_AUDIO,
++    CODEC_ID_MP2,
++    sizeof(MPADecodeContext),
++    mp3_decode_init,
++    NULL,
++    mp3_decode_close,
++    mp3_decode_frame,
++    CODEC_CAP_PARSE_ONLY,
++    .flush= flush,
++    .long_name= NULL_IF_CONFIG_SMALL("MP2 (MPEG audio layer 2)"),
++};
++#endif
++#if CONFIG_MP3_DECODER
++AVCodec mp3_decoder =
++{
++    "mp3",
++    AVMEDIA_TYPE_AUDIO,
++    CODEC_ID_MP3,
++    sizeof(MPADecodeContext),
++    mp3_decode_init,
++    NULL,
++    mp3_decode_close,
++    mp3_decode_frame,
++    CODEC_CAP_PARSE_ONLY,
++    .flush= flush,
++    .long_name= NULL_IF_CONFIG_SMALL("MP3 (MPEG audio layer 3)"),
++};
++#endif
++
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_wmadec.c gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_wmadec.c
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/hy_wmadec.c	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/hy_wmadec.c	2011-11-29 16:18:45.895831537 +0800
+@@ -0,0 +1,182 @@
++/*
++ * WMA compatible decoder
++ * Copyright (c) 2002 The FFmpeg Project
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/**
++ * @file
++ * WMA compatible decoder.
++ * This decoder handles Microsoft Windows Media Audio data, versions 1 & 2.
++ * WMA v1 is identified by audio format 0x160 in Microsoft media files
++ * (ASF/AVI/WAV). WMA v2 is identified by audio format 0x161.
++ *
++ * To use this decoder, a calling application must supply the extra data
++ * bytes provided with the WMA data. These are the extra, codec-specific
++ * bytes at the end of a WAVEFORMATEX data structure. Transmit these bytes
++ * to the decoder using the extradata[_size] fields in AVCodecContext. There
++ * should be 4 extra bytes for v1 data and 6 extra bytes for v2 data.
++ */
++
++#include "avcodec.h"
++#include "wma.h"
++#include "wma_dec_api.h"
++
++#undef NDEBUG
++#include <assert.h>
++
++#define EXPVLCBITS 8
++#define EXPMAX ((19+EXPVLCBITS-1)/EXPVLCBITS)
++
++#define HGAINVLCBITS 9
++#define HGAINMAX ((13+HGAINVLCBITS-1)/HGAINVLCBITS)
++
++WmaAudioContext  *g_wma_para;
++
++
++static void wma_lsp_to_curve_init(WMACodecContext *s, int frame_len);
++
++
++static int wma_decode_init(AVCodecContext * avctx)
++{
++    WMACodecContext *s = avctx->priv_data;
++    int i, flags2;
++    uint8_t *extradata;
++    unsigned char *version;
++    psysfuncb_t sysfun;
++    waveformatex_t  wformat;
++
++    wma_dec_get_property(NULL, WMA_DEC_Get_VERSION, &version);
++    g_print("%s\n", version);
++
++    sysfun.psys_free = av_free;
++    sysfun.psys_malloc = av_malloc;
++    sysfun.psys_realloc = av_realloc;
++    sysfun.psys_memcpy = memcpy;
++    sysfun.psys_memmove = memmove;
++    sysfun.psys_memset = memset;
++    sysfun.psys_qsort = qsort;
++    wma_dec_set_property(NULL, WMA_DEC_Set_SysFunc, &sysfun);
++
++    g_wma_para = wma_dec_init();
++    if(g_wma_para == NULL)
++        g_print("wma_dec_init failed!\n");
++
++    wma_dec_reset(g_wma_para);
++
++    if(avctx->codec->id == CODEC_ID_WMAV1)
++        wformat.wFormatTag = CODEC_AUDIO_WMAV1;
++    else
++        wformat.wFormatTag = CODEC_AUDIO_WMAV2;
++
++    wformat.nChannels = avctx->channels;
++    wformat.nSamplesPerSec = avctx->sample_rate;
++    wformat.nAvgBytesPerSec = avctx->bit_rate >> 3;
++    wformat.nBlockAlign = avctx->block_align;
++    wformat.wBitsPerSample = 16;
++    wformat.extradata_size = avctx->extradata_size;
++    wformat.extradata = avctx->extradata;
++    wma_dec_set_property(g_wma_para, WMA_DEC_Set_Wavfmt, &wformat);
++    
++    g_print("channels %d, samplerate %d, block align %d\n", g_wma_para->channels, g_wma_para->sample_rate, wformat.nBlockAlign);
++    g_print("codec id %d, extra size %d, bit rate %d\n", g_wma_para->codec_id, g_wma_para->extradata_size, g_wma_para->bit_rate);
++
++    for(i=0;i<g_wma_para->extradata_size;i++)
++        g_print("extradata[%d] = %x\n", i, g_wma_para->extradata[i]);
++
++    avctx->sample_fmt = SAMPLE_FMT_S16;
++
++    return 0;
++
++}
++
++
++static int wma_decode_superframe(AVCodecContext *avctx,
++                                 void *data, int *data_size,
++                                 AVPacket *avpkt)
++{
++    const uint8_t *buf = avpkt->data;
++    int buf_size = avpkt->size;
++    WMACodecContext *s = avctx->priv_data;
++    int nb_frames, bit_offset, i, pos, len;
++    uint8_t *q;
++    int     samples;
++    int     ret, used;
++    static  int  count, total_samples;
++    int     pkt_done_flag, buf_used;
++
++    //g_print("output size: %d\n", *data_size);
++    count += 1;
++    //g_print("frame %d, total samples = %d\n", count, total_samples);
++ 
++    pkt_done_flag = 0;
++    buf_used = 0;
++    while(!pkt_done_flag)
++    {
++        // use optimized codec
++        ret = wma_dec_decode_frame(g_wma_para, buf, buf_size, (data + buf_used), &used);
++        if(ret != WMA_DEC_ERR_NoErr)
++            g_print("wma_dec_decode_frame failed, err: %d\n", ret);
++
++        wma_dec_get_property(g_wma_para, WMA_DEC_Get_Samples, &samples);
++        buf_used += samples * sizeof(int16_t);
++
++        total_samples += samples;
++        //g_print("input size %d, consumed %d, output size %d\n", buf_size, used, *data_size);
++
++        wma_dec_get_property(g_wma_para, WMA_DEC_Get_PktDecdone_Flag, &pkt_done_flag);
++    }
++
++    *data_size = buf_used;
++
++    return used;
++}
++
++
++static av_cold int wma_decode_close(AVCodecContext *avctx)
++{
++    wma_dec_free(g_wma_para);
++
++    return 0;
++}
++
++AVCodec wmav1_decoder =
++{
++    "wmav1",
++    AVMEDIA_TYPE_AUDIO,
++    CODEC_ID_WMAV1,
++    sizeof(WMACodecContext),
++    wma_decode_init,
++    NULL,
++    wma_decode_close,
++    wma_decode_superframe,
++    .long_name = NULL_IF_CONFIG_SMALL("Windows Media Audio 1"),
++};
++
++AVCodec wmav2_decoder =
++{
++    "wmav2",
++    AVMEDIA_TYPE_AUDIO,
++    CODEC_ID_WMAV2,
++    sizeof(WMACodecContext),
++    wma_decode_init,
++    NULL,
++    wma_decode_close,
++    wma_decode_superframe,
++    .long_name = NULL_IF_CONFIG_SMALL("Windows Media Audio 2"),
++};
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/Makefile gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/Makefile
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/Makefile	2011-11-29 16:19:38.360356982 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/Makefile	2011-11-29 16:18:45.979838124 +0800
+@@ -43,13 +43,15 @@
+ OBJS-$(CONFIG_VDPAU)                   += vdpau.o
+ 
+ # decoders/encoders/hardware accelerators
+-OBJS-$(CONFIG_AAC_DECODER)             += aac.o aactab.o aacsbr.o
++#OBJS-$(CONFIG_AAC_DECODER)             += aac.o aactab.o aacsbr.o
++OBJS-$(CONFIG_AAC_DECODER)             += hy_aac.o
+ OBJS-$(CONFIG_AAC_ENCODER)             += aacenc.o aaccoder.o    \
+                                           aacpsy.o aactab.o      \
+                                           psymodel.o iirfilter.o \
+                                           mpeg4audio.o
+ OBJS-$(CONFIG_AASC_DECODER)            += aasc.o msrledec.o
+-OBJS-$(CONFIG_AC3_DECODER)             += ac3dec.o ac3dec_data.o ac3.o
++#OBJS-$(CONFIG_AC3_DECODER)             += ac3dec.o ac3dec_data.o ac3.o
++OBJS-$(CONFIG_AC3_DECODER)             += hy_ac3dec.o
+ OBJS-$(CONFIG_AC3_ENCODER)             += ac3enc.o ac3tab.o ac3.o
+ OBJS-$(CONFIG_ALAC_DECODER)            += alac.o
+ OBJS-$(CONFIG_ALAC_ENCODER)            += alacenc.o
+@@ -87,7 +89,8 @@
+ OBJS-$(CONFIG_COOK_DECODER)            += cook.o
+ OBJS-$(CONFIG_CSCD_DECODER)            += cscd.o
+ OBJS-$(CONFIG_CYUV_DECODER)            += cyuv.o
+-OBJS-$(CONFIG_DCA_DECODER)             += dca.o synth_filter.o dcadsp.o
++#OBJS-$(CONFIG_DCA_DECODER)             += dca.o synth_filter.o dcadsp.o
++OBJS-$(CONFIG_DCA_DECODER)             += hy_dtsdec.o
+ OBJS-$(CONFIG_DNXHD_DECODER)           += dnxhddec.o dnxhddata.o
+ OBJS-$(CONFIG_DNXHD_ENCODER)           += dnxhdenc.o dnxhddata.o       \
+                                           mpegvideo_enc.o motion_est.o \
+@@ -190,10 +193,12 @@
+ OBJS-$(CONFIG_MLP_DECODER)             += mlpdec.o mlpdsp.o
+ OBJS-$(CONFIG_MMVIDEO_DECODER)         += mmvideo.o
+ OBJS-$(CONFIG_MOTIONPIXELS_DECODER)    += motionpixels.o
+-OBJS-$(CONFIG_MP1_DECODER)             += mpegaudiodec.o mpegaudiodecheader.o \
+-                                          mpegaudio.o mpegaudiodata.o
+-OBJS-$(CONFIG_MP2_DECODER)             += mpegaudiodec.o mpegaudiodecheader.o \
+-                                          mpegaudio.o mpegaudiodata.o
++#OBJS-$(CONFIG_MP1_DECODER)             += mpegaudiodec.o mpegaudiodecheader.o \
++#                                          mpegaudio.o mpegaudiodata.o
++OBJS-$(CONFIG_MP1_DECODER)             += hy_mp3dec.o
++#OBJS-$(CONFIG_MP2_DECODER)             += mpegaudiodec.o mpegaudiodecheader.o \
++#                                          mpegaudio.o mpegaudiodata.o
++OBJS-$(CONFIG_MP2_DECODER)             += hy_mp3dec.o
+ OBJS-$(CONFIG_MP2_ENCODER)             += mpegaudioenc.o mpegaudio.o \
+                                           mpegaudiodata.o
+ OBJS-$(CONFIG_MP3ADU_DECODER)          += mpegaudiodec.o mpegaudiodecheader.o \
+@@ -201,8 +206,9 @@
+ OBJS-$(CONFIG_MP3ON4_DECODER)          += mpegaudiodec.o mpegaudiodecheader.o \
+                                           mpegaudio.o mpegaudiodata.o         \
+                                           mpeg4audio.o
+-OBJS-$(CONFIG_MP3_DECODER)             += mpegaudiodec.o mpegaudiodecheader.o \
+-                                          mpegaudio.o mpegaudiodata.o
++#OBJS-$(CONFIG_MP3_DECODER)             += mpegaudiodec.o mpegaudiodecheader.o \
++#                                          mpegaudio.o mpegaudiodata.o
++OBJS-$(CONFIG_MP3_DECODER)             += hy_mp3dec.o
+ OBJS-$(CONFIG_MPC7_DECODER)            += mpc7.o mpc.o mpegaudiodec.o      \
+                                           mpegaudiodecheader.o mpegaudio.o \
+                                           mpegaudiodata.o
+@@ -365,9 +371,11 @@
+ OBJS-$(CONFIG_VQA_DECODER)             += vqavideo.o
+ OBJS-$(CONFIG_WAVPACK_DECODER)         += wavpack.o
+ OBJS-$(CONFIG_WMAPRO_DECODER)          += wmaprodec.o wma.o
+-OBJS-$(CONFIG_WMAV1_DECODER)           += wmadec.o wma.o aactab.o
++#OBJS-$(CONFIG_WMAV1_DECODER)           += wmadec.o wma.o aactab.o
++OBJS-$(CONFIG_WMAV1_DECODER)           += hy_wmadec.o
+ OBJS-$(CONFIG_WMAV1_ENCODER)           += wmaenc.o wma.o aactab.o
+-OBJS-$(CONFIG_WMAV2_DECODER)           += wmadec.o wma.o aactab.o
++#OBJS-$(CONFIG_WMAV2_DECODER)           += wmadec.o wma.o aactab.o
++OJBS-$(CONFIG_WMAV2_DECODER)           += hy_wmadec.o
+ OBJS-$(CONFIG_WMAV2_ENCODER)           += wmaenc.o wma.o aactab.o
+ OBJS-$(CONFIG_WMAVOICE_DECODER)        += wmavoice.o \
+                                           celp_math.o celp_filters.o \
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/mp3_dec_api.h gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/mp3_dec_api.h
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/mp3_dec_api.h	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/mp3_dec_api.h	2011-11-29 16:18:46.007842808 +0800
+@@ -0,0 +1,151 @@
++/*********************************************************************
++* Copyright (c) 2010-2011 Huaya Micro
++* All Rights Reserved.
++*
++* Description: 
++* Mp3 decoder API header file
++*
++* Author:   Huang Shen
++* Created Date: 2010-12-22
++* 
++* History:
++* Date         Name        Description
++* 2010-12-22   Shen        Init Version
++*********************************************************************/
++
++#ifndef LIBMP3_DEC_API_H
++#define LIBMP3_DEC_API_H
++
++/* Define as `__inline' if that's what the C compiler calls it, or to nothing
++   if it is not supported. */
++#define inline __inline
++
++enum mad_error {
++  MAD_ERROR_NONE	   = 0x0000,	/* no error */
++
++  MAD_ERROR_BUFLEN	   = 0x0001,	/* input buffer too small (or EOF) */
++  MAD_ERROR_BUFPTR	   = 0x0002,	/* invalid (null) buffer pointer */
++
++  MAD_ERROR_NOMEM	   = 0x0031,	/* not enough memory */
++  MP3_ERR_GETPROPERTY  = 0x0032,
++  MP3_ERR_SETPROPERTY,
++  
++  MAD_ERROR_LOSTSYNC	   = 0x0101,	/* lost synchronization */
++  MAD_ERROR_BADLAYER	   = 0x0102,	/* reserved header layer value */
++  MAD_ERROR_BADBITRATE	   = 0x0103,	/* forbidden bitrate value */
++  MAD_ERROR_BADSAMPLERATE  = 0x0104,	/* reserved sample frequency value */
++  MAD_ERROR_BADEMPHASIS	   = 0x0105,	/* reserved emphasis value */
++
++  MAD_ERROR_BADCRC	   = 0x0201,	/* CRC check failed */
++  MAD_ERROR_BADBITALLOC	   = 0x0211,	/* forbidden bit allocation value */
++  MAD_ERROR_BADSCALEFACTOR = 0x0221,	/* bad scalefactor index */
++  MAD_ERROR_BADMODE        = 0x0222,	/* bad bitrate/mode combination */
++  MAD_ERROR_BADFRAMELEN	   = 0x0231,	/* bad frame length */
++  MAD_ERROR_BADBIGVALUES   = 0x0232,	/* bad big_values count */
++  MAD_ERROR_BADBLOCKTYPE   = 0x0233,	/* reserved block_type */
++  MAD_ERROR_BADSCFSI	   = 0x0234,	/* bad scalefactor selection info */
++  MAD_ERROR_BADDATAPTR	   = 0x0235,	/* bad main_data_begin pointer */
++  MAD_ERROR_BADPART3LEN	   = 0x0236,	/* bad audio data length */
++  MAD_ERROR_BADHUFFTABLE   = 0x0237,	/* bad Huffman table select */
++  MAD_ERROR_BADHUFFDATA	   = 0x0238,	/* Huffman data overrun */
++  MAD_ERROR_BADSTEREO	   = 0x0239	/* incompatible block_type for JS */
++};
++
++
++enum 
++{
++    MP3_GET_SAMPLERATE = 0,
++    MP3_GET_SAMPLES,
++    MP3_GET_OUTCHNUM,
++    MP3_GET_FRAMECOUNT,
++    MP3_GET_VERSION,
++
++	MP3_SET_MALLOC,
++	MP3_SET_FREE,
++	MP3_SET_MEMSET,
++	MP3_SET_MEMCOPY,
++	MP3_SET_MEMMOVE,
++};
++
++typedef struct mad_decoder  mp3dec_para_t;
++
++/*********************************************************************
++* Description
++*   Function: mp3_dec_sync
++* Parameters
++*   inbuf :        (input) Input buffer addrsss
++*   pos :          (output) Point to the sync word in current frame
++*   sample_rate :  (output) Returns the sample_rate of current frame
++* Returns
++*   returns the framesize of current AC3 frame                     
++*********************************************************************/
++int  mp3_dec_sync(unsigned char *inbuf, int length, int *pos, unsigned int *sample_rate, int *framesize);
++
++/***********************************************************
++* Description
++*   malloc memory for mp3dec_para_t and return the pointer
++* Returns
++*   returns pointer to mp3dec_para_t                    
++***********************************************************/
++mp3dec_para_t*  mp3_dec_init();
++
++/***********************************************************
++* Description
++*   free memory which was malloced in init routine
++* Parameters
++*   mp3dec : (input) Point to mp3dec_para_t structure
++* Returns
++*   void
++***********************************************************/
++void   mp3_dec_free(mp3dec_para_t *mp3dec);
++
++/***********************************************************
++* Description
++*   reset MP3 decode
++* Parameters
++*   mp3dec :  (modified) Pointer to mp3dec_para_t struct
++* Returns
++*   void
++***********************************************************/
++void  mp3_dec_reset(mp3dec_para_t *mp3dec);
++
++/***********************************************************
++* Description
++*   Decode one frame of MP3 bitstream
++* Parameters
++*   mp3dec : (modified)	Point to mp3dec_para_t structure
++*   inbuf  : (input)	Input buffer addrsss
++*   input_size : (input) Avaiable data length of input buffer
++*   outbuf :  (output) Output buffer address
++*   used   : (output) Number of bytes in input buffer which has been used to decode current frame.
++* Returns
++*   returns MP3_NOERR if successful. Otherwise an errorcode is returned.
++***********************************************************/
++int    mp3_dec_decode_frame(mp3dec_para_t *mp3dec, unsigned char *inbuf, int input_size, signed short *outbuf, int *used);
++
++/***********************************************************
++* Description
++*   Get one property from MP3 decoder
++* Parameters
++*   mp3dec : (modified)	Point to ac3dec_para_t structure
++*   property   : (input) Property to get
++*   value : (output) Returns property's value
++* Returns
++*   returns MP3_NOERR if successful. Otherwise MP3_ERR_GETPROPERTY is returned.
++***********************************************************/
++int    mp3_dec_get_property(mp3dec_para_t *mp3dec, int property, int *value);
++
++
++/***********************************************************
++* Description
++*   Set one property for MP3 decoder
++* Parameters
++*   mp3dec   : (modified) Point to ac3dec_para_t structure
++*   property : (input)    Property to set
++*   value    : (input)    property's value
++* Returns
++*   returns MP3_NOERR if successful. Otherwise MP3_ERR_SETPROPERTY is returned.
++***********************************************************/
++int    mp3_dec_set_property(mp3dec_para_t *mp3dec, int property, int value);
++
++#endif /*LIBMP3_DEC_API_H*/
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/mpegaudiodec.c gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/mpegaudiodec.c
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/mpegaudiodec.c	2011-11-29 16:19:38.352822171 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/mpegaudiodec.c	2011-11-29 16:18:45.952463002 +0800
+@@ -39,6 +39,8 @@
+ 
+ #include "mathops.h"
+ 
++#include "mp3_dec_api.h"
++
+ /* WARNING: only correct for posititive numbers */
+ #define FIXR(a)   ((int)((a) * FRAC_ONE + 0.5))
+ #define FRAC_RND(a) (((a) + (FRAC_ONE/2)) >> FRAC_BITS)
+@@ -52,6 +54,13 @@
+ #include "mpegaudiodata.h"
+ #include "mpegaudiodectab.h"
+ 
++#define  INPUT_SIZE      4096
++
++mp3dec_para_t  *g_mp3_para;
++unsigned char in_buf[INPUT_SIZE];
++int           data_len;
++
++
+ static void compute_antialias_integer(MPADecodeContext *s, GranuleDef *g);
+ static void compute_antialias_float(MPADecodeContext *s, GranuleDef *g);
+ 
+@@ -283,6 +292,37 @@
+ }
+ #endif
+ 
++static av_cold int mp3_decode_init(AVCodecContext * avctx)
++{
++    MPADecodeContext *s = avctx->priv_data;
++    static int init=0;
++    int i, j, k;
++    unsigned char *version;
++
++    g_print("entering decode_init, sample rate %d\n", avctx->sample_rate);
++
++    mp3_dec_set_property(NULL, MP3_SET_MALLOC, av_malloc);
++    mp3_dec_set_property(NULL, MP3_SET_FREE, av_free);
++    mp3_dec_set_property(NULL, MP3_SET_MEMSET, memset);
++    mp3_dec_set_property(NULL, MP3_SET_MEMCOPY, memcpy);
++    mp3_dec_set_property(NULL, MP3_SET_MEMMOVE, memmove);
++
++    g_mp3_para = mp3_dec_init();
++
++    mp3_dec_get_property(g_mp3_para, MP3_GET_VERSION, &version);
++    g_print("%s\n", version);
++
++    mp3_dec_reset(g_mp3_para);
++
++    data_len = 0;
++
++    avctx->sample_fmt = SAMPLE_FMT_S16;
++
++    return 0;
++    
++
++}
++
+ static av_cold int decode_init(AVCodecContext * avctx)
+ {
+     MPADecodeContext *s = avctx->priv_data;
+@@ -2212,6 +2252,69 @@
+     return nb_frames * 32 * sizeof(OUT_INT) * s->nb_channels;
+ }
+ 
++static av_cold int mp3_decode_close(AVCodecContext *avctx)
++{
++    mp3_dec_free(g_mp3_para);
++
++    return 0;
++}
++
++
++static int mp3_decode_frame(AVCodecContext * avctx,
++                        void *data, int *data_size,
++                        AVPacket *avpkt)
++{
++    const uint8_t *buf = avpkt->data;
++    int buf_size = avpkt->size;
++    MPADecodeContext *s = avctx->priv_data;
++    uint32_t header;
++    int out_size;
++    OUT_INT *out_samples = data;
++    int  used, ret, samples, channels;
++    int  consumed, samplerate;
++
++    if(data_len + buf_size < INPUT_SIZE)
++    {
++        memcpy(&in_buf[data_len], buf, buf_size);
++        data_len += buf_size;
++        consumed = buf_size;
++    }
++    else
++    {
++        g_print("Input buffer not enough!\n");
++        return -1;
++    }
++
++    //g_print("data_len = %d\n", data_len);
++
++    ret = mp3_dec_decode_frame(g_mp3_para, in_buf, data_len, data, &used);
++    if(ret != MAD_ERROR_NONE)
++    {
++        g_print("mp3_dec_decode_frame error, ret %d\n", ret);
++        return -1;
++    }
++
++    data_len -= used;
++    memmove(in_buf, &in_buf[used], data_len);
++    
++    mp3_dec_get_property(g_mp3_para, MP3_GET_SAMPLES, &samples);
++    mp3_dec_get_property(g_mp3_para, MP3_GET_OUTCHNUM, &channels);
++    mp3_dec_get_property(g_mp3_para, MP3_GET_SAMPLERATE, &samplerate);
++
++    avctx->sample_rate = samplerate;    
++    avctx->channels = channels;
++
++    //g_print("samples %d, channels %d, sample rate %d\n", samples, channels, samplerate);
++
++    *data_size = (samples*channels*sizeof(short));
++
++    return consumed;
++
++    
++
++
++}
++
+ static int decode_frame(AVCodecContext * avctx,
+                         void *data, int *data_size,
+                         AVPacket *avpkt)
+@@ -2490,49 +2593,49 @@
+ }
+ #endif /* CONFIG_MP3ON4_DECODER */
+ 
+-#if CONFIG_MP1_DECODER
++#if 0
+ AVCodec mp1_decoder =
+ {
+     "mp1",
+     AVMEDIA_TYPE_AUDIO,
+     CODEC_ID_MP1,
+     sizeof(MPADecodeContext),
+-    decode_init,
++    mp3_decode_init,
+     NULL,
+-    NULL,
+-    decode_frame,
++    mp3_decode_close,
++    mp3_decode_frame,
+     CODEC_CAP_PARSE_ONLY,
+     .flush= flush,
+     .long_name= NULL_IF_CONFIG_SMALL("MP1 (MPEG audio layer 1)"),
+ };
+ #endif
+-#if CONFIG_MP2_DECODER
++#if 0
+ AVCodec mp2_decoder =
+ {
+     "mp2",
+     AVMEDIA_TYPE_AUDIO,
+     CODEC_ID_MP2,
+     sizeof(MPADecodeContext),
+-    decode_init,
+-    NULL,
++    mp3_decode_init,
+     NULL,
+-    decode_frame,
++    mp3_decode_close,
++    mp3_decode_frame,
+     CODEC_CAP_PARSE_ONLY,
+     .flush= flush,
+     .long_name= NULL_IF_CONFIG_SMALL("MP2 (MPEG audio layer 2)"),
+ };
+ #endif
+-#if CONFIG_MP3_DECODER
++#if 0
+ AVCodec mp3_decoder =
+ {
+     "mp3",
+     AVMEDIA_TYPE_AUDIO,
+     CODEC_ID_MP3,
+     sizeof(MPADecodeContext),
+-    decode_init,
+-    NULL,
++    mp3_decode_init,
+     NULL,
+-    decode_frame,
++    mp3_decode_close,
++    mp3_decode_frame,
+     CODEC_CAP_PARSE_ONLY,
+     .flush= flush,
+     .long_name= NULL_IF_CONFIG_SMALL("MP3 (MPEG audio layer 3)"),
+diff -rNu gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/wma_dec_api.h gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/wma_dec_api.h
+--- gst-ffmpeg-0.10.11-old/gst-libs/ext/ffmpeg/libavcodec/wma_dec_api.h	1970-01-01 08:00:00.000000000 +0800
++++ gst-ffmpeg-0.10.11-new/gst-libs/ext/ffmpeg/libavcodec/wma_dec_api.h	2011-11-29 16:18:46.007842808 +0800
+@@ -0,0 +1,188 @@
++#ifndef __WMA_DEC_API_H__
++#define __WMA_DEC_API_H__
++
++//#define MAX_OUT_BUF_SIZE (128*1024) //128k
++#define PACKAGE "wmadec" /* Name of package */
++#define VERSION "0.3.0" /* Version number of package */
++#define MAX_OUT_BUF_SIZE (8*1024) //8k
++
++enum 
++{
++    CODEC_AUDIO_WMAV1=0x160,
++    CODEC_AUDIO_WMAV2=0x161,
++};
++
++enum wma_decError 
++{
++    WMA_DEC_ERR_NoErr = 0,
++    WMA_DEC_ERR_UNKNOW=-100,
++    WMA_DEC_ERR_NBFRAMES,
++    WMA_DEC_ERR_LASTFRAME_LEN,
++    WMA_DEC_ERR_EXCEED_MAX_CODED_SUPERFRAME_SIZE,
++    WMA_DEC_ERR_LACK_OUTPUTMEM,
++    WMA_DEC_ERR_PREV_BLOCK_LEN_BITS_OUTRANGE,
++    WMA_DEC_ERR_BLOCK_LEN_BITS_OUTRANGE,
++    WMA_DEC_ERR_NEXT_BLOCK_LEN_BITS_OUTRANGE,
++    WMA_DEC_ERR_FRAMELEN_OVERFLOW,
++    WMA_DEC_ERR_HGAIN_VLC_INVALID,
++    WMA_DEC_ERR_DECODE_EXP_VLC_ERR,
++    WMA_DEC_ERR_INIT,
++    WMA_DEC_ERR_GetProperty = -1000,
++    WMA_DEC_ERR_SetProperty,
++    WMA_DEC_ERR_Init,
++    WMA_DEC_ERR_Sync,
++    WMA_DEC_ERR_,
++};
++
++enum wma_decProperty 
++{
++    WMA_DEC_Get_Samplerate = 0,
++    WMA_DEC_Get_Samples,
++    WMA_DEC_Get_FrameLength,
++    WMA_DEC_Get_nbChannels,
++    WMA_DEC_Get_VERSION,
++    WMA_DEC_Get_Block_Align,
++    WMA_DEC_Get_PktDecdone_Flag,
++    WMA_DEC_Get_NbFramsInPkt,
++    WMA_DEC_Get_ByteUsed_When_Err,
++ 
++    WMA_DEC_Set_MemCallback = 100,
++    WMA_DEC_Set_Wavfmt,
++    WMA_DEC_Set_SysFunc,
++#if 0
++    WMA_DEC_Set_Codec_id,
++    WMA_DEC_Set_Extradata,
++    WMA_DEC_Set_ExtradataSize,
++    WMA_DEC_Set_BitRate,
++    WMA_DEC_Set_SampleRate,
++    WMA_DEC_Set_Channels,
++    WMA_DEC_Set_BlockAling,
++    WMA_DEC_Set_MaxOutputSize,
++    WMA_DEC_Set_Malloc,
++    WMA_DEC_Set_Realloc,
++    WMA_DEC_Set_MemFree,
++#endif
++};
++
++typedef struct waveformatex_s {
++	unsigned short wFormatTag;
++	unsigned short nChannels;
++	unsigned int   nSamplesPerSec;
++	unsigned int   nAvgBytesPerSec;
++	unsigned short nBlockAlign;
++	unsigned short wBitsPerSample;
++	unsigned short extradata_size;
++	char *extradata;
++
++}waveformatex_t;
++
++typedef struct sysfuncb_s
++{
++	 void *psys_malloc;
++	 void *psys_realloc;
++	 void *psys_free;
++	 void *psys_memcpy;
++	 void *psys_memset;
++	 void *psys_memmove;
++	 void *psys_qsort;
++}psysfuncb_t;
++
++typedef struct _WmaAudioContext 
++{
++    /* Codec Context */
++    int block_align;
++    int nb_packets;
++    int frame_number;
++    int sample_rate;
++    int channels;
++    int bit_rate;
++    int flags;
++    int sample_fmt;
++    unsigned int channel_layout;
++
++    /*codec extradata*/
++    int extradata_size;
++    unsigned char *extradata;    
++
++    int output_size;
++    int max_output_size;
++    int codec_id;
++    void *priv_data;
++	waveformatex_t *wfp;
++
++	/*added by myself*/
++	int new_pktheader_flag;
++	int pkt_dec_done_flag;
++	int nb_frames_in_packet;
++	int nb_fra_decoded_cnt;
++	//int nb_inbuf_used_bits;
++	int nb_inbuf_used_bytes;
++	int bit_offset_pktheader;
++	int inbuf_size_original;
++	char *inbuf_original;
++	
++} WmaAudioContext;
++
++
++/**********************************************************
++ * 该函数用来完成对cook解码器的初始化
++ * avctx 指向WmaAudioContext结构体, 先要清0, 接着要初始化好里面的codec_id, sample_rate, channels,
++ * bit_rate, block_align, extradata_size和extradata, 这些信息都可以从demux中取得的.
++ * 
++ * 返回值:  WMA_DEC_ERR_NoErr    成功
++ *          其它                失败
++ **********************************************************/
++WmaAudioContext *wma_dec_init();
++
++
++/**********************************************************
++ * 该函数是解码主函数
++ * avctx 指向WmaAudioContext结构体
++ * inbuf 指向输入缓冲区
++ * input_size 表示inbuf的大小,单位是字节, 大小至少为block_align,否则不会解码该帧,
++ *            一般从demux取得的asf中的一个packet里都含有整数倍block_align的数据
++ * outbuf 指向输出缓冲区, 要预先分配好, 大小根据不同的文件会有差异,最大不超过128k字节
++ * used 返回使用了inbuf的大小, 只要正常解码都会返回与block_align一样的值, 
++ *      如果不是这个值且返回正确,说明input_size太小,不够解码
++ * 返回值:  WMA_DEC_ERR_NoErr    正确完成,没有出错
++ *          负数                出错
++ **********************************************************/
++int wma_dec_decode_frame(WmaAudioContext *avctx, unsigned char *inbuf, int input_size, signed short *outbuf, int *used);
++
++
++/***********************************************************
++ * 该函数用于释放解码函数中申请的内存
++ * avctx 指向WmaAudioContext结构体
++ ***********************************************************/
++int wma_dec_free(WmaAudioContext *avctx);
++
++
++
++/***********************************************************
++ * 该函数用来取得一些属性值
++ * avctx 指向WmaAudioContext结构体
++ * property WMA_DEC_Get_Samples      取得生成了多少个样本, 单位sizeof(short),用于在decode后取得outbuf的大小
++ *
++ * 返回值:  WMA_DEC_ERR_NoErr       正确返回
++ *          WMA_DEC_ERR_GetProperty 出错
++ **********************************************************/
++int wma_dec_get_property(WmaAudioContext *avctx, int property, int *value);
++
++
++/***********************************************************
++ * 该函数用来设置一些属性值
++ * avctx 指向WmaAudioContext结构体
++ ***********************************************************/
++int wma_dec_set_property(WmaAudioContext *avctx, int property, int value);
++
++
++
++/***********************************************************
++ * 该函数用来在重新定位后对解码器进行复位
++ * avctx 指向WmaAudioContext结构体
++ **********************************************************/
++void wma_dec_reset(WmaAudioContext *avctx);
++
++
++#endif
++

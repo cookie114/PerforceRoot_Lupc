@@ -1,0 +1,541 @@
+libgstboda_la-boda_vpu.lo: boda_vpu.c boda_vpu.h hal_arch.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gst.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/galloca.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtypes.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/lib/glib-2.0/include/glibconfig.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmacros.h \
+ /opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include/stddef.h \
+ /opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include-fixed/soft-float/el/limits.h \
+ /opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include-fixed/soft-float/el/syslimits.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/limits.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/features.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/predefs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/cdefs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/wordsize.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/gnu/stubs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/posix1_lim.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/local_lim.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/linux/limits.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/posix2_lim.h \
+ /opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include/float.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/garray.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gasyncqueue.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gthread.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gerror.h \
+ /opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include/stdarg.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gquark.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gutils.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gatomic.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbacktrace.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/signal.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigset.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/types.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/typesizes.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/signum.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/time.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/siginfo.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigaction.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigcontext.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sgidefs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigstack.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/pthreadtypes.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/endian.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/endian.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/byteswap.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigthread.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbase64.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbitlock.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbookmarkfile.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/time.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/xlocale.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gcache.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/glist.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmem.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gslice.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gchecksum.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gcompletion.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gconvert.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gdataset.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gdate.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gdir.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gfileutils.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/ghash.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/ghook.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/ghostutils.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/giochannel.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmain.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gpoll.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gslist.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gstring.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gunicode.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gkeyfile.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmappedfile.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmarkup.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmessages.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gnode.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/goption.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gpattern.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gprimes.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gqsort.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gqueue.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/grand.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/grel.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gregex.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gscanner.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gsequence.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gshell.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gspawn.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gstrfuncs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtestutils.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gthreadpool.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtimer.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtree.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gurifuncs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gvarianttype.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gvariant.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/glib-compat.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstenumtypes.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib-object.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gboxed.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gtype.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/genums.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gobject.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gvalue.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gparam.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gclosure.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gsignal.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gmarshal.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gparamspecs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gsourceclosure.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gtypemodule.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gtypeplugin.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gvaluearray.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gvaluetypes.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstversion.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbin.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstelement.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstconfig.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstobject.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpad.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbuffer.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstminiobject.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstclock.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstcaps.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gststructure.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbufferlist.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstevent.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstformat.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstiterator.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttaglist.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstquery.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttask.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttaskpool.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpadtemplate.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbus.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstmessage.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstelementfactory.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstplugin.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/types.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/select.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/select.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/sysmacros.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/stat.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/stat.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gmodule.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstmacros.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpluginfeature.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstindex.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstindexfactory.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstchildproxy.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstdebugutils.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsterror.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/errno.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/errno.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/linux/errno.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/asm/errno.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/asm-generic/errno-base.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstghostpad.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstinfo.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstinterface.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstmarshal.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstparamspecs.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstvalue.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpipeline.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpoll.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpreset.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstregistry.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstsegment.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstsystemclock.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttagsetter.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttrace.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttypefind.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttypefindfactory.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsturi.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstutils.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstparse.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstxml.h \
+ /opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstcompat.h \
+ boda_reg.h BODA7503.h
+
+boda_vpu.h:
+
+hal_arch.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gst.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/galloca.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtypes.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/lib/glib-2.0/include/glibconfig.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmacros.h:
+
+/opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include/stddef.h:
+
+/opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include-fixed/soft-float/el/limits.h:
+
+/opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include-fixed/soft-float/el/syslimits.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/limits.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/features.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/predefs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/cdefs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/wordsize.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/gnu/stubs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/posix1_lim.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/local_lim.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/linux/limits.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/posix2_lim.h:
+
+/opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include/float.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/garray.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gasyncqueue.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gthread.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gerror.h:
+
+/opt/mips-4.4/bin/../lib/gcc/mips-linux-gnu/4.4.1/include/stdarg.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gquark.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gutils.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gatomic.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbacktrace.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/signal.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigset.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/types.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/typesizes.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/signum.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/time.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/siginfo.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigaction.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigcontext.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sgidefs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigstack.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/pthreadtypes.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/endian.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/endian.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/byteswap.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/sigthread.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbase64.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbitlock.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gbookmarkfile.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/time.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/xlocale.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gcache.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/glist.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmem.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gslice.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gchecksum.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gcompletion.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gconvert.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gdataset.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gdate.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gdir.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gfileutils.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/ghash.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/ghook.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/ghostutils.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/giochannel.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmain.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gpoll.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gslist.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gstring.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gunicode.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gkeyfile.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmappedfile.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmarkup.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gmessages.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gnode.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/goption.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gpattern.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gprimes.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gqsort.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gqueue.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/grand.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/grel.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gregex.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gscanner.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gsequence.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gshell.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gspawn.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gstrfuncs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtestutils.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gthreadpool.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtimer.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gtree.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gurifuncs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gvarianttype.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib/gvariant.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/glib-compat.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstenumtypes.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/glib-object.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gboxed.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gtype.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/genums.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gobject.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gvalue.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gparam.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gclosure.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gsignal.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gmarshal.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gparamspecs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gsourceclosure.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gtypemodule.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gtypeplugin.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gvaluearray.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gobject/gvaluetypes.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstversion.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbin.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstelement.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstconfig.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstobject.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpad.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbuffer.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstminiobject.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstclock.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstcaps.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gststructure.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbufferlist.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstevent.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstformat.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstiterator.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttaglist.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstquery.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttask.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttaskpool.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpadtemplate.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstbus.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstmessage.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstelementfactory.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstplugin.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/types.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/select.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/select.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/sysmacros.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/sys/stat.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/stat.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/glib-2.0/gmodule.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstmacros.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpluginfeature.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstindex.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstindexfactory.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstchildproxy.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstdebugutils.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsterror.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/errno.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/bits/errno.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/linux/errno.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/asm/errno.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/libc/usr/include/asm-generic/errno-base.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstghostpad.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstinfo.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstinterface.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstmarshal.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstparamspecs.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstvalue.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpipeline.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpoll.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstpreset.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstregistry.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstsegment.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstsystemclock.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttagsetter.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttrace.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttypefind.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsttypefindfactory.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gsturi.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstutils.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstparse.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstxml.h:
+
+/opt/mips-4.4/bin/../mips-linux-gnu/include/gstreamer-0.10/gst/gstcompat.h:
+
+boda_reg.h:
+
+BODA7503.h:

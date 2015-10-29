@@ -1,0 +1,77 @@
+diff -ruaN ./gst-plugins-bad-0.10.20/sys/dvb/gstdvbsrc.c gst-plugins-bad-0.10.20.new/sys/dvb/gstdvbsrc.c
+--- ./gst-plugins-bad-0.10.20/sys/dvb/gstdvbsrc.c	2010-09-03 05:30:31.000000000 +0800
++++ gst-plugins-bad-0.10.20.new/sys/dvb/gstdvbsrc.c	2011-06-08 17:06:46.033770000 +0800
+@@ -88,7 +88,8 @@
+   ARG_DVBSRC_HIERARCHY_INF,
+   ARG_DVBSRC_TUNE,
+   ARG_DVBSRC_INVERSION,
+-  ARG_DVBSRC_STATS_REPORTING_INTERVAL
++  ARG_DVBSRC_STATS_REPORTING_INTERVAL,
++  ARG_DVBSRC_BLOCKSIZE
+ };
+ 
+ #define DEFAULT_ADAPTER 0
+@@ -445,6 +446,12 @@
+           "stats-reporting-interval",
+           "The number of reads before reporting frontend stats",
+           0, G_MAXUINT, DEFAULT_STATS_REPORTING_INTERVAL, G_PARAM_READWRITE));
++
++  g_object_class_install_property (gobject_class,
++      ARG_DVBSRC_BLOCKSIZE,
++      g_param_spec_uint ("blocksize", "blocksize",
++          "The size of block to push, it's better performance for multipule of 188",
++          188, G_MAXUINT, DEFAULT_BUFFER_SIZE, G_PARAM_READWRITE));
+ }
+ 
+ /* initialize the new element
+@@ -487,7 +494,7 @@
+   object->hierarchy_information = DEFAULT_HIERARCHY;
+   object->inversion = DEFAULT_INVERSION;
+   object->stats_interval = DEFAULT_STATS_REPORTING_INTERVAL;
+-
++  object->blocksize = DEFAULT_BUFFER_SIZE;
+   object->tune_mutex = g_mutex_new ();
+ }
+ 
+@@ -626,6 +633,9 @@
+       object->stats_interval = g_value_get_uint (value);
+       object->stats_counter = 0;
+       break;
++    case ARG_DVBSRC_BLOCKSIZE:
++      object->blocksize = g_value_get_uint (value);
++      break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+   }
+@@ -690,6 +700,9 @@
+     case ARG_DVBSRC_STATS_REPORTING_INTERVAL:
+       g_value_set_uint (value, object->stats_interval);
+       break;
++    case ARG_DVBSRC_BLOCKSIZE:
++      g_value_set_uint (value, object->blocksize);
++      break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+   }
+@@ -975,8 +988,8 @@
+   object = GST_DVBSRC (element);
+   GST_LOG ("fd_dvr: %d", object->fd_dvr);
+ 
+-  //g_object_get(G_OBJECT(object), "blocksize", &buffer_size, NULL);
+-  buffer_size = DEFAULT_BUFFER_SIZE;
++  g_object_get(G_OBJECT(object), "blocksize", &buffer_size, NULL);
++  //buffer_size = DEFAULT_BUFFER_SIZE;
+ 
+   /* device can not be tuned during read */
+   g_mutex_lock (object->tune_mutex);
+diff -ruaN ./gst-plugins-bad-0.10.20/sys/dvb/gstdvbsrc.h gst-plugins-bad-0.10.20.new/sys/dvb/gstdvbsrc.h
+--- ./gst-plugins-bad-0.10.20/sys/dvb/gstdvbsrc.h	2010-09-03 05:30:31.000000000 +0800
++++ gst-plugins-bad-0.10.20.new/sys/dvb/gstdvbsrc.h	2011-06-08 17:06:46.033770000 +0800
+@@ -73,6 +73,7 @@
+     guint stats_interval;
+     guint stats_counter;
+     gboolean need_unlock;
++    guint blocksize;
+   };
+ 
+   struct _GstDvbSrcClass

@@ -1,0 +1,48 @@
+diff -Nur ./gst-plugins-base-0.10.35/gst-libs/gst/audio/Makefile.am ./gst-plugins-base-0.10.35-new/gst-libs/gst/audio/Makefile.am
+--- ./gst-plugins-base-0.10.35/gst-libs/gst/audio/Makefile.am	2011-06-14 21:18:56.000000000 +0800
++++ ./gst-plugins-base-0.10.35-new/gst-libs/gst/audio/Makefile.am	2012-11-05 09:56:16.000000000 +0800
+@@ -53,7 +53,8 @@
+ noinst_PROGRAMS = testchannels
+ testchannels_SOURCES = testchannels.c
+ testchannels_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS)
+-testchannels_LDADD =  $(builddir)/libgstaudio-$(GST_MAJORMINOR).la $(GST_LIBS)
++testchannels_LDADD =  $(builddir)/libgstaudio-$(GST_MAJORMINOR).la \
++    $(top_builddir)/gst-libs/gst/interfaces/libgstinterfaces-@GST_MAJORMINOR@.la $(GST_LIBS)
+ 
+ include $(top_srcdir)/common/gst-glib-gen.mak
+ 
+diff -Nur ./gst-plugins-base-0.10.35/gst-libs/gst/audio/Makefile.in ./gst-plugins-base-0.10.35-new/gst-libs/gst/audio/Makefile.in
+--- ./gst-plugins-base-0.10.35/gst-libs/gst/audio/Makefile.in	2011-06-16 02:19:26.000000000 +0800
++++ ./gst-plugins-base-0.10.35-new/gst-libs/gst/audio/Makefile.in	2012-11-05 09:56:16.000000000 +0800
+@@ -154,6 +154,7 @@
+ testchannels_OBJECTS = $(am_testchannels_OBJECTS)
+ testchannels_DEPENDENCIES =  \
+ 	$(builddir)/libgstaudio-$(GST_MAJORMINOR).la \
++	$(top_builddir)/gst-libs/gst/interfaces/libgstinterfaces-@GST_MAJORMINOR@.la \
+ 	$(am__DEPENDENCIES_1)
+ testchannels_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(testchannels_CFLAGS) \
+@@ -532,7 +533,9 @@
+ libgstaudio_@GST_MAJORMINOR@_la_LDFLAGS = $(GST_LIB_LDFLAGS) $(GST_ALL_LDFLAGS) $(GST_LT_LDFLAGS)
+ testchannels_SOURCES = testchannels.c
+ testchannels_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS)
+-testchannels_LDADD = $(builddir)/libgstaudio-$(GST_MAJORMINOR).la $(GST_LIBS)
++testchannels_LDADD = $(builddir)/libgstaudio-$(GST_MAJORMINOR).la \
++    $(top_builddir)/gst-libs/gst/interfaces/libgstinterfaces-@GST_MAJORMINOR@.la $(GST_LIBS)
++
+ enum_headers = $(foreach h,$(glib_enum_headers),\n\#include \"$(h)\")
+ @HAVE_INTROSPECTION_TRUE@BUILT_GIRSOURCES = GstAudio-@GST_MAJORMINOR@.gir
+ @HAVE_INTROSPECTION_TRUE@gir_headers = $(patsubst %,$(srcdir)/%, \
+diff -Nur ./gst-plugins-base-0.10.35/ltmain.sh ./gst-plugins-base-0.10.35-new/ltmain.sh
+--- ./gst-plugins-base-0.10.35/ltmain.sh	2011-06-15 21:21:20.000000000 +0800
++++ ./gst-plugins-base-0.10.35-new/ltmain.sh	2012-11-05 09:56:16.000000000 +0800
+@@ -9267,7 +9267,8 @@
+ 	      *.la)
+ 		func_basename "$deplib"
+ 		name="$func_basename_result"
+-		eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
++		func_resolve_sysroot "$deplib"
++		eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $func_resolve_sysroot_result`
+ 		test -z "$libdir" && \
+ 		  func_fatal_error "\`$deplib' is not a valid libtool archive"
+ 		func_append newdependency_libs " ${lt_sysroot:+=}$libdir/$name"

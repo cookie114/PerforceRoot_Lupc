@@ -1,0 +1,308 @@
+diff -Nura ./gst-plugins-bad-0.10.22/gst/mpegdemux/gstmpegdemux.c ./gst-plugins-bad-0.10.22-new/gst/mpegdemux/gstmpegdemux.c
+--- ./gst-plugins-bad-0.10.22/gst/mpegdemux/gstmpegdemux.c	2011-04-15 07:24:47.000000000 +0800
++++ ./gst-plugins-bad-0.10.22-new/gst/mpegdemux/gstmpegdemux.c	2012-11-05 10:44:45.000000000 +0800
+@@ -57,6 +57,8 @@
+ #define SCAN_SCR_SZ                 12
+ #define SCAN_PTS_SZ                 80
+ 
++#define MPEG_TMP_BUF                 (64*1024)
++
+ #define SEGMENT_THRESHOLD (300*GST_MSECOND)
+ #define VIDEO_SEGMENT_THRESHOLD (500*GST_MSECOND)
+ 
+@@ -286,6 +288,11 @@
+       if (stream->pad)
+         gst_element_remove_pad (GST_ELEMENT_CAST (demux), stream->pad);
+ 
++      if (stream->buf)
++        free(stream->buf);
++      if (stream->meta_buf)
++        gst_buffer_unref(stream->meta_buf);
++
+       g_free (stream);
+       demux->streams[i] = NULL;
+     }
+@@ -402,6 +409,15 @@
+   stream->type = stream_type;
+   stream->pad = gst_pad_new_from_template (template, name);
+   stream->segment_thresh = threshold;
++
++  if (threshold == VIDEO_SEGMENT_THRESHOLD) {
++    stream->buf = malloc(MPEG_TMP_BUF);
++    stream->buf_pos = 0;
++    stream->meta_buf = gst_buffer_new();
++  }
++  else
++    stream->buf = 0;
++
+   gst_pad_set_event_function (stream->pad,
+       GST_DEBUG_FUNCPTR (gst_flups_demux_src_event));
+   gst_pad_set_query_function (stream->pad,
+@@ -453,6 +469,7 @@
+   GstFlowReturn result;
+   guint64 timestamp;
+   guint size;
++  gboolean sent = FALSE;
+ 
+   if (stream == NULL)
+     goto no_stream;
+@@ -555,11 +572,38 @@
+   demux->next_pts = G_MAXUINT64;
+   demux->next_dts = G_MAXUINT64;
+ 
+-  result = gst_pad_push (stream->pad, buf);
+-  GST_DEBUG_OBJECT (demux, "pushed stream id 0x%02x type 0x%02x, time: %"
+-      GST_TIME_FORMAT ", size %d. result: %s",
+-      stream->id, stream->type, GST_TIME_ARGS (timestamp),
+-      size, gst_flow_get_name (result));
++  if (stream->buf && stream->buf_pos && (timestamp != GST_CLOCK_TIME_NONE || stream->buf_pos+size > MPEG_TMP_BUF)) {
++    GstBuffer *tmp = gst_buffer_new_and_alloc(stream->buf_pos);
++    gst_buffer_copy_metadata(tmp, stream->meta_buf, GST_BUFFER_COPY_ALL);
++    GST_BUFFER_SIZE(tmp) = stream->buf_pos;
++    memcpy(GST_BUFFER_DATA(tmp), stream->buf, stream->buf_pos);
++    result = gst_pad_push (stream->pad, tmp);
++    GST_DEBUG_OBJECT (demux, "pushed stream id 0x%02x type 0x%02x, time: %"
++        GST_TIME_FORMAT ", size %d. result: %s",
++        stream->id, stream->type, GST_TIME_ARGS (timestamp),
++        stream->buf_pos, gst_flow_get_name (result));
++    stream->buf_pos = 0;
++    sent = TRUE;
++  }
++
++  if (!stream->buf || size > MPEG_TMP_BUF) {
++    result = gst_pad_push (stream->pad, buf);
++    GST_DEBUG_OBJECT (demux, "pushed stream id 0x%02x type 0x%02x, time: %"
++        GST_TIME_FORMAT ", size %d. result: %s",
++        stream->id, stream->type, GST_TIME_ARGS (timestamp),
++        size, gst_flow_get_name (result));
++  }
++  else {
++    if (!stream->buf_pos)
++      gst_buffer_copy_metadata(stream->meta_buf, buf, GST_BUFFER_COPY_ALL);
++
++    memcpy(stream->buf + stream->buf_pos, GST_BUFFER_DATA(buf), size);
++    stream->buf_pos += size;
++    gst_buffer_unref(buf);
++
++    if (!sent)
++      result = GST_FLOW_OK;
++  }
+ 
+   return result;
+ 
+diff -Nura ./gst-plugins-bad-0.10.22/gst/mpegdemux/gstmpegdemux.h ./gst-plugins-bad-0.10.22-new/gst/mpegdemux/gstmpegdemux.h
+--- ./gst-plugins-bad-0.10.22/gst/mpegdemux/gstmpegdemux.h	2010-04-29 16:59:29.000000000 +0800
++++ ./gst-plugins-bad-0.10.22-new/gst/mpegdemux/gstmpegdemux.h	2012-11-05 10:44:45.000000000 +0800
+@@ -93,6 +93,10 @@
+   gboolean discont;
+   gboolean notlinked;
+   gboolean need_segment;
++
++  GstBuffer *meta_buf;
++  unsigned char *buf;
++  size_t buf_pos;
+ };
+ 
+ struct _GstFluPSDemux
+diff -Nura ./gst-plugins-bad-0.10.22/gst/mpegdemux/gstmpegtsdemux.c ./gst-plugins-bad-0.10.22-new/gst/mpegdemux/gstmpegtsdemux.c
+--- ./gst-plugins-bad-0.10.22/gst/mpegdemux/gstmpegtsdemux.c	2011-04-27 00:42:00.000000000 +0800
++++ ./gst-plugins-bad-0.10.22-new/gst/mpegdemux/gstmpegtsdemux.c	2012-11-05 10:44:45.000000000 +0800
+@@ -609,6 +609,18 @@
+   return stream;
+ }
+ 
++ static gboolean
++gst_mpeg_desc_reg_format_id_in_array(GArray *array, guint32 identifier)
++{
++  guint i = 0;
++  for (; i < array->len; ++i) {
++    guint8 *desc = g_array_index(array, guint8*, i);
++    if (DESC_REGISTRATION_format_identifier (desc) == identifier)
++      return TRUE;
++  }
++  return FALSE;
++}
++
+ static gboolean
+ gst_mpegts_demux_fill_stream (GstMpegTSStream * stream, guint8 id,
+     guint8 stream_type)
+@@ -618,6 +630,9 @@
+   GstMpegTSDemuxClass *klass;
+   GstMpegTSDemux *demux;
+   GstCaps *caps;
++  GArray *stream_desc_reg_array = NULL;
++  gboolean is_hdmv = FALSE;
++
+ 
+   if (stream->stream_type && stream->stream_type != stream_type)
+     goto wrong_type;
+@@ -629,6 +644,31 @@
+   template = NULL;
+   caps = NULL;
+ 
++  if (stream->ES_info) {
++    stream_desc_reg_array =
++      gst_mpeg_descriptor_find_all (stream->ES_info, DESC_REGISTRATION);
++    if (stream_desc_reg_array &&
++        gst_mpeg_desc_reg_format_id_in_array(stream_desc_reg_array, DRF_ID_HDMV)) {
++      is_hdmv = TRUE;
++    }
++  }
++
++  if (!is_hdmv) {
++    GstMpegTSStream *PMT_stream =
++      gst_mpegts_demux_get_stream_for_PID (stream->demux, stream->PMT_pid);
++    GstMPEGDescriptor *program_info = PMT_stream->PMT.program_info;
++    if (program_info) {
++      GArray *program_desc_reg_array =
++        gst_mpeg_descriptor_find_all (program_info, DESC_REGISTRATION);
++      if (program_desc_reg_array) {
++        if (gst_mpeg_desc_reg_format_id_in_array(program_desc_reg_array, DRF_ID_HDMV)) {
++          is_hdmv = TRUE;
++        }
++        g_array_free(program_desc_reg_array, TRUE);
++      }
++    }
++  }
++
+   switch (stream_type) {
+     case ST_VIDEO_MPEG1:
+     case ST_VIDEO_MPEG2:
+@@ -711,11 +751,8 @@
+       break;
+     case ST_PRIVATE_EA:        /* Try to detect a VC1 stream */
+     {
+-      guint8 *desc = NULL;
+-
+-      if (stream->ES_info)
+-        desc = gst_mpeg_descriptor_find (stream->ES_info, DESC_REGISTRATION);
+-      if (!(desc && DESC_REGISTRATION_format_identifier (desc) == DRF_ID_VC1)) {
++      if (!(stream_desc_reg_array &&
++          gst_mpeg_desc_reg_format_id_in_array(stream_desc_reg_array, DRF_ID_VC1))) {
+         GST_WARNING ("0xea private stream type found but no descriptor "
+             "for VC1. Assuming plain VC1.");
+       }
+@@ -727,47 +764,7 @@
+           NULL);
+       break;
+     }
+-    case ST_BD_AUDIO_AC3:
+-    {
+-      GstMpegTSStream *PMT_stream =
+-          gst_mpegts_demux_get_stream_for_PID (stream->demux, stream->PMT_pid);
+-      GstMPEGDescriptor *program_info = PMT_stream->PMT.program_info;
+-      guint8 *desc = NULL;
+-
+-      if (program_info)
+-        desc = gst_mpeg_descriptor_find (program_info, DESC_REGISTRATION);
+-
+-      if (desc && DESC_REGISTRATION_format_identifier (desc) == DRF_ID_HDMV) {
+-        template = klass->audio_template;
+-        name = g_strdup_printf ("audio_%04x", stream->PID);
+-        caps = gst_caps_new_simple ("audio/x-eac3", NULL);
+-      } else if (stream->ES_info && gst_mpeg_descriptor_find (stream->ES_info,
+-              DESC_DVB_ENHANCED_AC3)) {
+-        template = klass->audio_template;
+-        name = g_strdup_printf ("audio_%04x", stream->PID);
+-        caps = gst_caps_new_simple ("audio/x-eac3", NULL);
+-      } else {
+-        if (!stream->ES_info ||
+-            !gst_mpeg_descriptor_find (stream->ES_info, DESC_DVB_AC3)) {
+-          GST_WARNING ("AC3 stream type found but no corresponding "
+-              "descriptor to differentiate between AC3 and EAC3. "
+-              "Assuming plain AC3.");
+-        }
+-        template = klass->audio_template;
+-        name = g_strdup_printf ("audio_%04x", stream->PID);
+-        caps = gst_caps_new_simple ("audio/x-ac3", NULL);
+-      }
+-      break;
+-    }
+-    case ST_BD_AUDIO_EAC3:
+-      template = klass->audio_template;
+-      name = g_strdup_printf ("audio_%04x", stream->PID);
+-      caps = gst_caps_new_simple ("audio/x-eac3", NULL);
+-      break;
+     case ST_PS_AUDIO_DTS:
+-    case ST_BD_AUDIO_DTS:
+-    case ST_BD_AUDIO_DTS_HD:
+-    case ST_BD_AUDIO_DTS_HD_MASTER_AUDIO:
+       template = klass->audio_template;
+       name = g_strdup_printf ("audio_%04x", stream->PID);
+       caps = gst_caps_new_simple ("audio/x-dts", NULL);
+@@ -777,24 +774,52 @@
+       name = g_strdup_printf ("audio_%04x", stream->PID);
+       caps = gst_caps_new_simple ("audio/x-lpcm", NULL);
+       break;
+-    case ST_BD_AUDIO_LPCM:
+-      template = klass->audio_template;
+-      name = g_strdup_printf ("audio_%04x", stream->PID);
+-      caps = gst_caps_new_simple ("audio/x-private-ts-lpcm", NULL);
+-      break;
+     case ST_PS_DVD_SUBPICTURE:
+       template = klass->subpicture_template;
+       name = g_strdup_printf ("subpicture_%04x", stream->PID);
+       caps = gst_caps_new_simple ("video/x-dvd-subpicture", NULL);
+       break;
+-    case ST_BD_PGS_SUBPICTURE:
+-      template = klass->subpicture_template;
+-      name = g_strdup_printf ("subpicture_%04x", stream->PID);
+-      caps = gst_caps_new_simple ("subpicture/x-pgs", NULL);
+-      break;
+     default:
+       break;
+   }
++
++  if (!template && is_hdmv) {
++    switch (stream_type) {
++      case ST_BD_AUDIO_AC3:
++        template = klass->audio_template;
++        name = g_strdup_printf ("audio_%04x", stream->PID);
++        caps = gst_caps_new_simple ("audio/x-ac3", NULL);
++        break;
++      case ST_BD_AUDIO_EAC3:
++        template = klass->audio_template;
++        name = g_strdup_printf ("audio_%04x", stream->PID);
++        caps = gst_caps_new_simple ("audio/x-eac3", NULL);
++        break;
++      case ST_BD_AUDIO_DTS:
++      case ST_BD_AUDIO_DTS_HD:
++      case ST_BD_AUDIO_DTS_HD_MASTER_AUDIO:
++        template = klass->audio_template;
++        name = g_strdup_printf ("audio_%04x", stream->PID);
++        caps = gst_caps_new_simple ("audio/x-dts", NULL);
++        break;
++      case ST_BD_AUDIO_LPCM:
++        template = klass->audio_template;
++        name = g_strdup_printf ("audio_%04x", stream->PID);
++        caps = gst_caps_new_simple ("audio/x-private-ts-lpcm", NULL);
++        break;
++      case ST_BD_PGS_SUBPICTURE:
++        template = klass->subpicture_template;
++        name = g_strdup_printf ("subpicture_%04x", stream->PID);
++        caps = gst_caps_new_simple ("subpicture/x-pgs", NULL);
++        break;
++      default:
++        break;
++    }
++  }
++
++  if (stream_desc_reg_array)
++    g_array_free(stream_desc_reg_array, TRUE);
++
+   if (name == NULL || template == NULL || caps == NULL)
+     return FALSE;
+ 
+diff -Nura ./gst-plugins-bad-0.10.22/ltmain.sh ./gst-plugins-bad-0.10.22-new/ltmain.sh
+--- ./gst-plugins-bad-0.10.22/ltmain.sh	2011-05-10 17:20:08.000000000 +0800
++++ ./gst-plugins-bad-0.10.22-new/ltmain.sh	2012-11-05 10:46:23.000000000 +0800
+@@ -9267,7 +9267,8 @@
+ 	      *.la)
+ 		func_basename "$deplib"
+ 		name="$func_basename_result"
+-		eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
++		func_resolve_sysroot "$deplib"
++		eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $func_resolve_sysroot_result`
+ 		test -z "$libdir" && \
+ 		  func_fatal_error "\`$deplib' is not a valid libtool archive"
+ 		func_append newdependency_libs " ${lt_sysroot:+=}$libdir/$name"

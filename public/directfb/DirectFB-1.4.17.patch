@@ -1,0 +1,2215 @@
+diff -Nru ./DirectFB-1.4.17/configure ./DirectFB-1.4.17-new/configure
+--- ./DirectFB-1.4.17/configure	2012-05-23 21:45:14.000000000 +0800
++++ ./DirectFB-1.4.17-new/configure	2013-03-04 15:59:35.448972202 +0800
+@@ -679,6 +679,8 @@
+ DBOX2REMOTE_TRUE
+ SH772X_SHJPEG_FALSE
+ SH772X_SHJPEG_TRUE
++GFX_HUAYA_FALSE
++GFX_HUAYA_TRUE
+ GFX_VMWARE_FALSE
+ GFX_VMWARE_TRUE
+ GFX_UNICHROME_FALSE
+@@ -1736,8 +1738,8 @@
+                           drivers), none (builds none), ati128, cle266,
+                           cyber5k, davinci, ep9x, gl, i810, i830, mach64,
+                           matrox, neomagic, nsc, nvidia, omap, pxa3xx, radeon,
+-                          savage, sh772x, sis315, tdfx, unichrome, vmware.
+-                          [default=all]
++                          savage, sh772x, sis315, tdfx, unichrome, vmware,
++                          huaya. [default=all]
+   --with-inputdrivers=LIST
+                           LIST is a comma separated selection of inputdrivers
+                           to build. Possible inputdrivers are: all (builds all
+@@ -18948,6 +18950,7 @@
+ tdfx=no
+ unichrome=no
+ vmware=no
++huaya=no
+ 
+ if test "$have_linux" = "yes"; then
+ 
+@@ -18984,6 +18987,7 @@
+   checkfor_tdfx=yes
+   checkfor_unichrome=yes
+   checkfor_vmware=yes
++  checkfor_huaya=yes
+ 
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: all" >&5
+ $as_echo "all" >&6; }
+@@ -19059,6 +19063,9 @@
+           vmware)
+                   checkfor_vmware=yes
+                   ;;
++          huaya)
++                  checkfor_huaya=yes
++                  ;;
+           *)
+                   echo "Unknown gfxdriver $gfxdriver, exiting!"
+                   exit 1
+@@ -19328,6 +19335,11 @@
+   vmware=yes
+ fi
+ 
++if test "$checkfor_huaya" = "yes"; then
++  huaya=yes
++fi
++
++
+ # lets check for input driver
+ 
+ checkfor_dbox2remote=no
+@@ -20207,6 +20219,14 @@
+   GFX_VMWARE_FALSE=
+ fi
+ 
++ if test "$huaya" = "yes"; then
++  GFX_HUAYA_TRUE=
++  GFX_HUAYA_FALSE='#'
++else
++  GFX_HUAYA_TRUE='#'
++  GFX_HUAYA_FALSE=
++fi
++
+ 
+  if test "$sh772x_shjpeg" = "yes"; then
+   SH772X_SHJPEG_TRUE=
+@@ -20496,7 +20516,7 @@
+ CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
+ 
+ 
+-ac_config_files="$ac_config_files directfb-config directfb.pc directfb-internal.pc directfb.spec Makefile include/Makefile include/directfb_build.h include/directfb_version.h lib/Makefile lib/direct/Makefile lib/direct/build.h lib/direct/direct.pc lib/fusion/Makefile lib/fusion/build.h lib/fusion/fusion.pc lib/fusion/shm/Makefile lib/One/Makefile lib/One/one.pc lib/One/linux-one/Makefile lib/voodoo/Makefile lib/voodoo/build.h lib/voodoo/voodoo.pc patches/Makefile proxy/Makefile proxy/dispatcher/Makefile proxy/requestor/Makefile rules/Makefile src/Makefile src/core/Makefile src/display/Makefile src/gfx/Makefile src/gfx/generic/Makefile src/input/Makefile src/media/Makefile src/misc/Makefile src/windows/Makefile systems/Makefile systems/devmem/Makefile systems/dummy/Makefile systems/fbdev/Makefile systems/x11/Makefile systems/osx/Makefile systems/sdl/Makefile systems/vnc/Makefile wm/Makefile wm/default/Makefile wm/unique/Makefile wm/unique/classes/Makefile wm/unique/data/Makefile wm/unique/devices/Makefile gfxdrivers/Makefile gfxdrivers/ati128/Makefile gfxdrivers/cle266/Makefile gfxdrivers/cyber5k/Makefile gfxdrivers/davinci/Makefile gfxdrivers/ep9x/Makefile gfxdrivers/gl/Makefile gfxdrivers/i810/Makefile gfxdrivers/i830/Makefile gfxdrivers/mach64/Makefile gfxdrivers/matrox/Makefile gfxdrivers/neomagic/Makefile gfxdrivers/nsc/Makefile gfxdrivers/nsc/include/Makefile gfxdrivers/nvidia/Makefile gfxdrivers/omap/Makefile gfxdrivers/pxa3xx/Makefile gfxdrivers/radeon/Makefile gfxdrivers/savage/Makefile gfxdrivers/sh772x/Makefile gfxdrivers/sis315/Makefile gfxdrivers/tdfx/Makefile gfxdrivers/unichrome/Makefile gfxdrivers/vmware/Makefile inputdrivers/Makefile inputdrivers/dbox2remote/Makefile inputdrivers/dreamboxremote/Makefile inputdrivers/dynapro/Makefile inputdrivers/elo/Makefile inputdrivers/gunze/Makefile inputdrivers/h3600_ts/Makefile inputdrivers/joystick/Makefile inputdrivers/keyboard/Makefile inputdrivers/linux_input/Makefile inputdrivers/lirc/Makefile inputdrivers/mutouch/Makefile inputdrivers/zytronic/Makefile inputdrivers/penmount/Makefile inputdrivers/ps2mouse/Makefile inputdrivers/serialmouse/Makefile inputdrivers/sonypi/Makefile inputdrivers/tslib/Makefile inputdrivers/ucb1x00_ts/Makefile inputdrivers/wm97xx_ts/Makefile interfaces/Makefile interfaces/ICoreResourceManager/Makefile interfaces/IDirectFBFont/Makefile interfaces/IDirectFBImageProvider/Makefile interfaces/IDirectFBVideoProvider/Makefile data/Makefile tests/Makefile tests/voodoo/Makefile tools/Makefile docs/Makefile docs/dfbg.1 docs/directfb-csource.1 docs/directfbrc.5 docs/html/Makefile"
++ac_config_files="$ac_config_files directfb-config directfb.pc directfb-internal.pc directfb.spec Makefile include/Makefile include/directfb_build.h include/directfb_version.h lib/Makefile lib/direct/Makefile lib/direct/build.h lib/direct/direct.pc lib/fusion/Makefile lib/fusion/build.h lib/fusion/fusion.pc lib/fusion/shm/Makefile lib/One/Makefile lib/One/one.pc lib/One/linux-one/Makefile lib/voodoo/Makefile lib/voodoo/build.h lib/voodoo/voodoo.pc patches/Makefile proxy/Makefile proxy/dispatcher/Makefile proxy/requestor/Makefile rules/Makefile src/Makefile src/core/Makefile src/display/Makefile src/gfx/Makefile src/gfx/generic/Makefile src/input/Makefile src/media/Makefile src/misc/Makefile src/windows/Makefile systems/Makefile systems/devmem/Makefile systems/dummy/Makefile systems/fbdev/Makefile systems/x11/Makefile systems/osx/Makefile systems/sdl/Makefile systems/vnc/Makefile wm/Makefile wm/default/Makefile wm/unique/Makefile wm/unique/classes/Makefile wm/unique/data/Makefile wm/unique/devices/Makefile gfxdrivers/Makefile gfxdrivers/ati128/Makefile gfxdrivers/cle266/Makefile gfxdrivers/cyber5k/Makefile gfxdrivers/davinci/Makefile gfxdrivers/ep9x/Makefile gfxdrivers/gl/Makefile gfxdrivers/i810/Makefile gfxdrivers/i830/Makefile gfxdrivers/mach64/Makefile gfxdrivers/matrox/Makefile gfxdrivers/neomagic/Makefile gfxdrivers/nsc/Makefile gfxdrivers/nsc/include/Makefile gfxdrivers/nvidia/Makefile gfxdrivers/omap/Makefile gfxdrivers/pxa3xx/Makefile gfxdrivers/radeon/Makefile gfxdrivers/savage/Makefile gfxdrivers/sh772x/Makefile gfxdrivers/sis315/Makefile gfxdrivers/tdfx/Makefile gfxdrivers/unichrome/Makefile gfxdrivers/vmware/Makefile gfxdrivers/huaya/Makefile inputdrivers/Makefile inputdrivers/dbox2remote/Makefile inputdrivers/dreamboxremote/Makefile inputdrivers/dynapro/Makefile inputdrivers/elo/Makefile inputdrivers/gunze/Makefile inputdrivers/h3600_ts/Makefile inputdrivers/joystick/Makefile inputdrivers/keyboard/Makefile inputdrivers/linux_input/Makefile inputdrivers/lirc/Makefile inputdrivers/mutouch/Makefile inputdrivers/zytronic/Makefile inputdrivers/penmount/Makefile inputdrivers/ps2mouse/Makefile inputdrivers/serialmouse/Makefile inputdrivers/sonypi/Makefile inputdrivers/tslib/Makefile inputdrivers/ucb1x00_ts/Makefile inputdrivers/wm97xx_ts/Makefile interfaces/Makefile interfaces/ICoreResourceManager/Makefile interfaces/IDirectFBFont/Makefile interfaces/IDirectFBImageProvider/Makefile interfaces/IDirectFBVideoProvider/Makefile data/Makefile tests/Makefile tests/voodoo/Makefile tools/Makefile docs/Makefile docs/dfbg.1 docs/directfb-csource.1 docs/directfbrc.5 docs/html/Makefile"
+ 
+ ac_config_commands="$ac_config_commands default"
+ 
+@@ -20842,6 +20862,10 @@
+   as_fn_error $? "conditional \"GFX_VMWARE\" was never defined.
+ Usually this means the macro was only invoked conditionally." "$LINENO" 5
+ fi
++if test -z "${GFX_HUAYA_TRUE}" && test -z "${GFX_HUAYA_FALSE}"; then
++  as_fn_error $? "conditional \"GFX_HUAYA\" was never defined.
++Usually this means the macro was only invoked conditionally." "$LINENO" 5
++fi
+ if test -z "${SH772X_SHJPEG_TRUE}" && test -z "${SH772X_SHJPEG_FALSE}"; then
+   as_fn_error $? "conditional \"SH772X_SHJPEG\" was never defined.
+ Usually this means the macro was only invoked conditionally." "$LINENO" 5
+@@ -21998,6 +22022,7 @@
+     "gfxdrivers/tdfx/Makefile") CONFIG_FILES="$CONFIG_FILES gfxdrivers/tdfx/Makefile" ;;
+     "gfxdrivers/unichrome/Makefile") CONFIG_FILES="$CONFIG_FILES gfxdrivers/unichrome/Makefile" ;;
+     "gfxdrivers/vmware/Makefile") CONFIG_FILES="$CONFIG_FILES gfxdrivers/vmware/Makefile" ;;
++    "gfxdrivers/huaya/Makefile") CONFIG_FILES="$CONFIG_FILES gfxdrivers/huaya/Makefile" ;;
+     "inputdrivers/Makefile") CONFIG_FILES="$CONFIG_FILES inputdrivers/Makefile" ;;
+     "inputdrivers/dbox2remote/Makefile") CONFIG_FILES="$CONFIG_FILES inputdrivers/dbox2remote/Makefile" ;;
+     "inputdrivers/dreamboxremote/Makefile") CONFIG_FILES="$CONFIG_FILES inputdrivers/dreamboxremote/Makefile" ;;
+@@ -23721,6 +23746,7 @@
+   VIA CLE266                $cle266
+   VIA UniChrome             $unichrome
+   VMWare                    $vmware
++  Huaya                     $huaya
+   --
+   OpenGL                    $gl (GLX: $glx)
+ 
+@@ -23766,6 +23792,7 @@
+   VIA CLE266                $cle266
+   VIA UniChrome             $unichrome
+   VMWare                    $vmware
++  Huaya                     $huaya
+   --
+   OpenGL                    $gl (GLX: $glx)
+ 
+diff -Nru ./DirectFB-1.4.17/configure.in ./DirectFB-1.4.17-new/configure.in
+--- ./DirectFB-1.4.17/configure.in	2012-05-23 21:43:12.000000000 +0800
++++ ./DirectFB-1.4.17-new/configure.in	2013-03-04 15:18:15.000000000 +0800
+@@ -967,6 +967,7 @@
+ tdfx=no
+ unichrome=no
+ vmware=no
++huaya=no
+ 
+ if test "$have_linux" = "yes"; then
+ 
+@@ -979,7 +980,7 @@
+                            [cyber5k, davinci, ep9x, gl, i810, i830, mach64,]
+                            [matrox, neomagic, nsc, nvidia, omap, pxa3xx,]
+                            [radeon, savage, sh772x, sis315, tdfx, unichrome,]
+-                           [vmware. @<:@default=all@:>@]),
++                           [vmware, huaya. @<:@default=all@:>@]),
+             [gfxdrivers="$withval"], [gfxdrivers=all])
+ if test "$gfxdrivers" = "all"; then
+   checkfor_ati128=yes
+@@ -1004,6 +1005,7 @@
+   checkfor_tdfx=yes
+   checkfor_unichrome=yes
+   checkfor_vmware=yes
++  checkfor_huaya=yes
+ 
+   AC_MSG_RESULT(all)
+ else 
+@@ -1078,6 +1080,9 @@
+           vmware)
+                   checkfor_vmware=yes
+                   ;;
++          huaya)
++                  checkfor_huaya=yes
++                  ;;
+           *)
+                   echo "Unknown gfxdriver $gfxdriver, exiting!"
+                   exit 1
+@@ -1191,6 +1196,11 @@
+   vmware=yes
+ fi
+ 
++if test "$checkfor_huaya" = "yes"; then
++  huaya=yes
++fi
++
++
+ # lets check for input driver
+ 
+ checkfor_dbox2remote=no
+@@ -1632,6 +1642,7 @@
+ AM_CONDITIONAL(GFX_TDFX, test "$tdfx" = "yes")
+ AM_CONDITIONAL(GFX_UNICHROME, test "$unichrome" = "yes")
+ AM_CONDITIONAL(GFX_VMWARE, test "$vmware" = "yes")
++AM_CONDITIONAL(GFX_HUAYA, test "$huaya" = "yes")
+ 
+ AM_CONDITIONAL(SH772X_SHJPEG, test "$sh772x_shjpeg" = "yes")
+ 
+@@ -1809,6 +1820,7 @@
+ gfxdrivers/tdfx/Makefile
+ gfxdrivers/unichrome/Makefile
+ gfxdrivers/vmware/Makefile
++gfxdrivers/huaya/Makefile
+ 
+ inputdrivers/Makefile
+ inputdrivers/dbox2remote/Makefile
+@@ -1945,6 +1957,7 @@
+   VIA CLE266                $cle266
+   VIA UniChrome             $unichrome
+   VMWare                    $vmware
++  Huaya                     $huaya
+   --
+   OpenGL                    $gl (GLX: $glx)
+ 
+diff -Nru ./DirectFB-1.4.17/gfxdrivers/huaya/huaya.c ./DirectFB-1.4.17-new/gfxdrivers/huaya/huaya.c
+--- ./DirectFB-1.4.17/gfxdrivers/huaya/huaya.c	1970-01-01 08:00:00.000000000 +0800
++++ ./DirectFB-1.4.17-new/gfxdrivers/huaya/huaya.c	2013-03-04 15:12:30.000000000 +0800
+@@ -0,0 +1,1149 @@
++/*
++   (c) Copyright 2001-2009  The world wide DirectFB Open Source Community (directfb.org)
++   (c) Copyright 2000-2004  Convergence (integrated media) GmbH
++
++   All rights reserved.
++
++   Written by Antonino Daplas <adaplas@pol.net>
++
++   This library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2 of the License, or (at your option) any later version.
++
++   This library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with this library; if not, write to the
++   Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.
++*/
++
++#include <config.h>
++
++#include <fbdev/fbdev.h>  /* FIXME: Needs to be included before dfb_types.h to work around a type clash with asm/types.h */
++#include <dfb_types.h>
++
++#include <stdio.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include <sys/mman.h>
++#include <fcntl.h>
++#include <sys/ioctl.h>
++#include <malloc.h>
++
++#include <directfb.h>
++
++#include <core/coredefs.h>
++#include <core/coretypes.h>
++#include <core/screens.h>
++
++#include <core/state.h>
++#include <core/gfxcard.h>
++#include <core/surface.h>
++
++/* need fb handle to get accel, MMIO programming in the i810 is useless */
++#include <gfx/convert.h>
++#include <gfx/util.h>
++#include <misc/conf.h>
++#include <misc/util.h>
++
++#include <core/graphics_driver.h>
++
++DFB_GRAPHICS_DRIVER( huaya )
++
++#include "huaya.h"
++
++
++
++#define HUAYA_SUPPORTED_DRAWINGFLAGS (DSDRAW_BLEND | DSDRAW_DST_COLORKEY | DSDRAW_SRC_PREMULTIPLY)
++
++#define HUAYA_SUPPORTED_DRAWINGFUNCTIONS   \
++                 (DFXL_FILLRECTANGLE | DFXL_DRAWRECTANGLE | DFXL_FILLTRIANGLE)
++
++#define HUAYA_SUPPORTED_BLITTINGFLAGS   \
++                 (DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_BLEND_COLORALPHA | DSBLIT_SRC_PREMULTIPLY | DSBLIT_SRC_COLORKEY | DSBLIT_DST_COLORKEY \
++                 | DSBLIT_ROTATE90 | DSBLIT_ROTATE180 | DSBLIT_ROTATE270 | DSBLIT_FLIP_HORIZONTAL | DSBLIT_FLIP_VERTICAL)
++
++#define HUAYA_SUPPORTED_BLITTINGFUNCTIONS  \
++                 (DFXL_BLIT | DFXL_STRETCHBLIT)
++
++
++#define GPE_SH_TH	10*10
++static RET_CODE gpe_linux_block_fill(huayaDeviceData * huaya_dev, INT32 dev,
++					struct block_data* dst,
++					struct rectangle* dst_rect,
++					UINT32 color,
++					BOOL cache_opr)
++{
++	int err;
++	struct gpe_blit_req_list {
++		int count;
++		struct gpe_cmd cmd[1];
++	} list;
++	int x, y, x_end, y_end, x_off, y_off;
++	enum pixel_type fmt;
++	unsigned char byte_pp;
++	unsigned int pitch;
++	unsigned char * ptr, * ptr1;
++
++	if (dst_rect->w * dst_rect->h > GPE_SH_TH) {
++		//printf("gpe_linux_block_fill 0x%x\n", dst->bits);
++		list.count = 1;
++		memcpy(&list.cmd[0].dst, dst, sizeof(struct block_data));
++		list.cmd[0].dst.bits = dfb_gfxcard_memory_physical((CoreGraphicsDevice *) huaya_dev, dst->bits);
++		memcpy(&list.cmd[0].dst_rect, dst_rect, sizeof(struct rectangle));
++		list.cmd[0].param.color2 = color;
++		list.cmd[0].param.cmd = cache_opr ? 0 : GPE_NO_DST_CACHE_OPR;
++
++		err = ioctl(dev, GPE_FILL, &list);
++
++		if (err < 0)
++			printf("gpe_linux_block_fill failed\n");
++		if (err == 0) {
++			return SUCCESS;
++		} else {
++			return ERR_STATUS;
++		}
++	}
++	else {
++		fmt= dst->format;
++		pitch = dst->pitch;
++
++		x_off = dst_rect->x;
++		y_off = dst_rect->y;
++		x_end = dst_rect->w;
++		y_end = dst_rect->h;
++
++		switch(fmt) {
++			case PIX_8CLUTARGB:
++				byte_pp = 1;
++				break;
++			case PIX_16ARGB1555:
++			case PIX_16ARGB0565:
++				byte_pp = 2;
++				break;
++			case PIX_32ARGB8888:
++			case PIX_32AYUV8888:
++				byte_pp = 4;
++				break;
++			default:
++				break;
++		}
++		ptr = dst->bits + x_off * byte_pp + y_off * pitch;
++		ptr = dfb_gfxcard_memory_virtual((CoreGraphicsDevice *) huaya_dev, ptr);
++
++		if (byte_pp == 4) {
++			for (y = y_end; y > 0; y--) {
++				for (x = x_end, ptr1 = ptr; x > 0; x --) {
++					*(UINT32 *)ptr1 = color;
++					ptr1 += 4;
++				}
++				ptr += pitch;
++			}
++		}
++		else if (byte_pp == 2) {
++			for (y = y_end; y > 0; y--) {
++				for (x = x_end, ptr1 = ptr; x > 0; x --) {
++					*(UINT16 *)ptr1 = (UINT16)color;
++					ptr1 += 2;
++				}
++				ptr += pitch;
++			}
++		}
++		else if (byte_pp == 1) {
++			for (y = y_end; y > 0; y--) {
++				memset(ptr, (UINT8)color, x_end);
++				ptr += pitch;
++			}
++		}
++	}
++}
++
++static RET_CODE gpe_linux_1block_transfer(huayaDeviceData * huaya_dev, INT32 dev,
++					struct block_data* src,
++					struct rectangle* src_rect,
++					struct block_data* dst,
++					struct rectangle* dst_rect,
++					struct gpe_parameter* param)
++{
++	int err;
++	int i;
++	struct gpe_blit_req_list {
++		int count;
++		struct gpe_cmd cmd[1];
++	} list;
++
++	//printf("gpe_linux_1block_transfer 0x%x\n",dst->bits);
++
++	list.count = 1;
++	memcpy(&list.cmd[0].src, src, sizeof(struct block_data));
++	list.cmd[0].src.bits = dfb_gfxcard_memory_physical((CoreGraphicsDevice *) huaya_dev, src->bits);
++	memcpy(&list.cmd[0].src_rect, src_rect, sizeof(struct rectangle));
++	memcpy(&list.cmd[0].dst, dst, sizeof(struct block_data));
++	list.cmd[0].dst.bits = dfb_gfxcard_memory_physical((CoreGraphicsDevice *) huaya_dev, dst->bits);
++	memcpy(&list.cmd[0].dst_rect, dst_rect, sizeof(struct rectangle));
++//	param->cmd |= GPE_NO_SRC_CACHE_OPR | GPE_NO_DST_CACHE_OPR;
++	memcpy(&list.cmd[0].param, param, sizeof(struct gpe_parameter));
++	if ( (src->format == PIX_8CLUT || src->format == PIX_8CLUTARGB || src->format == PIX_8CLUTAYUV) ) {
++//		CHECK(param->src2_pal != NULL);
++	}
++
++	err = ioctl(dev, GPE_BLIT, &list);
++
++	if (err < 0)
++		printf("gpe_linux_1block_transfer failed\n");
++	if (err == 0) {
++		return SUCCESS;
++	} else {
++	        for (i=0 ; i<list.count ; i++) {
++			printf("%d: src={pitch=%d, f=%d, rect={%d,%d,%d,%d}}\n"
++				"    dst={pitch=%d, f=%d, rect={%d,%d,%d,%d}}\n"
++				"    cmd=%08lx",
++		                    i,
++		                    list.cmd[i].src.pitch,
++		                    list.cmd[i].src.format,
++		                    list.cmd[i].src_rect.x,
++		                    list.cmd[i].src_rect.y,
++		                    list.cmd[i].src_rect.w,
++		                    list.cmd[i].src_rect.h,
++		                    list.cmd[i].dst.pitch,
++		                    list.cmd[i].dst.format,
++		                    list.cmd[i].dst_rect.x,
++		                    list.cmd[i].dst_rect.y,
++		                    list.cmd[i].dst_rect.w,
++		                    list.cmd[i].dst_rect.h,
++		                    list.cmd[i].param.cmd
++				);
++		}
++		return ERR_STATUS;
++	}
++}
++
++static RET_CODE gpe_linux_wait_hw_end(INT32 dev)
++{
++	int err;
++
++//	printf("gpe_linux_wait_hw_end \n");
++
++	err = ioctl(dev, GPE_WAIT, NULL);
++
++	if (err < 0)
++		printf("gpe_linux_wait_hw_end failed\n");
++	if (err == 0) {
++		return 0;
++	} else {
++		return ERR_STATUS;
++	}
++}
++
++
++static inline void
++huaya_wait_for_blit_idle(huayaDriverData *huaya_drv,
++			huayaDeviceData *huaya_dev )
++{
++	if (huaya_dev != NULL)
++		huaya_dev->idle_calls++;
++
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++}
++
++
++static void
++huayaFlushTextureCache(void *drv, void *dev)
++{
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++
++	huaya_wait_for_blit_idle(huaya_drv, huaya_dev);
++}
++
++static DFBResult
++huayaEngineSync(void *drv, void *dev)
++{
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++
++	huaya_wait_for_blit_idle(huaya_drv, huaya_dev);
++
++    return DFB_OK;
++}
++
++/*
++ * Set State routines
++ */
++static inline void
++huaya_set_src(huayaDriverData *huaya_drv,
++	     huayaDeviceData *huaya_dev,
++	     CardState      *state)
++{
++	CoreSurface   *source = state->source;
++
++	if (huaya_dev->i_src)
++		return;
++
++	huaya_dev->src.bits = state->src.offset;
++
++#ifdef GPE_UIO
++	huaya_dev->src.bits = hal_paddr_to_vaddr(huaya_dev->src.bits);
++#endif
++	huaya_dev->src.pitch = state->src.pitch;
++
++	switch (source->config.format) {
++	case DSPF_LUT8:
++		huaya_dev->src.format = PIX_8CLUTARGB;
++		break;
++	case DSPF_ARGB1555:
++		huaya_dev->src.format = PIX_16ARGB1555;
++		break;
++	case DSPF_RGB16:
++		huaya_dev->src.format = PIX_16ARGB0565;
++		break;
++	case DSPF_RGB32:
++		huaya_dev->src.format = PIX_32ARGB8888;
++		break;
++	case DSPF_ARGB:
++		huaya_dev->src.format = PIX_32ARGB8888;
++		break;
++	case DSPF_AYUV:
++		huaya_dev->src.format = PIX_32AYUV8888;
++		break;
++	default:
++		D_BUG("unexpected source pixelformat~0x%x", source->config.format);
++		return;
++	}
++	huaya_dev->i_src = 1;
++}
++
++static inline void
++huaya_set_dest(huayaDriverData *huaya_drv,
++	      huayaDeviceData *huaya_dev,
++	      CardState      *state)
++{
++	CoreSurface   *destination = state->destination;
++
++	if (huaya_dev->i_dst)
++		return;
++
++	huaya_dev->dst.bits = state->dst.offset;
++
++#ifdef GPE_UIO
++	huaya_dev->dst.bits = hal_paddr_to_vaddr(huaya_dev->dst.bits);
++#endif
++
++	huaya_dev->dst.pitch = state->dst.pitch;
++
++	switch (destination->config.format) {
++	case DSPF_LUT8:
++		huaya_dev->dst.format = PIX_8CLUTARGB;
++		break;
++	case DSPF_ARGB1555:
++		huaya_dev->dst.format = PIX_16ARGB1555;
++		break;
++	case DSPF_RGB16:
++		huaya_dev->dst.format = PIX_16ARGB0565;
++		break;
++	case DSPF_RGB32:
++		huaya_dev->dst.format = PIX_32ARGB8888;
++		break;
++	case DSPF_ARGB:
++		huaya_dev->dst.format = PIX_32ARGB8888;
++		break;
++	case DSPF_AYUV:
++		huaya_dev->dst.format = PIX_32AYUV8888;
++		break;
++	default:
++		D_BUG("unexpected destination pixelformat~,0x%x",destination->config.format);
++		return;
++	}
++	huaya_dev->i_dst = 1;
++}
++
++static inline void
++huaya_set_src_colorkey(huayaDriverData *huaya_drv,
++		  huayaDeviceData *huaya_dev,
++		  CardState      *state)
++{
++	if (huaya_dev->i_src_colorkey)
++		return;
++
++	huaya_dev->src_colorkey.low_value = state->src_colorkey;
++	huaya_dev->src_colorkey.high_value = state->src_colorkey;
++	huaya_dev->param.src_colorkey = &huaya_dev->src_colorkey;
++
++	huaya_dev->i_src_colorkey = 1;
++}
++
++static inline void
++huaya_set_dst_colorkey(huayaDriverData *huaya_drv,
++		  huayaDeviceData *huaya_dev,
++		  CardState      *state)
++{
++	if (huaya_dev->i_dst_colorkey)
++		return;
++
++	huaya_dev->dst_colorkey.low_value = state->dst_colorkey;
++	huaya_dev->dst_colorkey.high_value = state->dst_colorkey;
++	huaya_dev->param.dst_colorkey = &huaya_dev->dst_colorkey;
++	if (huaya_dev->param.cmd & GPE_SRC_COLOR_KEY)
++		return;
++
++	huaya_dev->i_dst_colorkey = 1;
++}
++
++static inline void
++huaya_set_color(huayaDriverData *huaya_drv,
++	       huayaDeviceData *huaya_dev,
++	       CardState      *state)
++{
++	if (huaya_dev->i_color)
++		return;
++
++     if (state->drawingflags & DSDRAW_SRC_PREMULTIPLY) {
++          state->color.r = (state->color.r * (state->color.a + 1)) >> 8;
++          state->color.g = (state->color.g * (state->color.a + 1)) >> 8;
++          state->color.b = (state->color.b * (state->color.a + 1)) >> 8;
++     }
++
++	switch (state->destination->config.format) {
++	case DSPF_LUT8:
++		huaya_dev->color_value = state->color_index;
++		break;
++	case DSPF_ARGB1555:
++		huaya_dev->color_value = PIXEL_ARGB1555(state->color.a,
++                                                      state->color.r,
++						      state->color.g,
++						      state->color.b);
++		break;
++	case DSPF_RGB16:
++		huaya_dev->color_value = PIXEL_RGB16(state->color.r,
++						   state->color.g,
++						   state->color.b);
++		break;
++	case DSPF_RGB32:
++		huaya_dev->color_value = PIXEL_RGB32(state->color.r,
++						   state->color.g,
++						   state->color.b);
++		break;
++	case DSPF_ARGB:
++		huaya_dev->color_value = PIXEL_ARGB(state->color.a, state->color.r, state->color.g, state->color.b);
++		break;
++	case DSPF_AYUV:
++		huaya_dev->color_value = PIXEL_AYUV(state->color.a, state->color.r, state->color.g, state->color.b);
++		break;
++	default:
++		D_BUG("unexpected pixelformat~");
++	}
++	huaya_dev->param.color2 = huaya_dev->color_value;
++	huaya_dev->i_color = 1;
++}
++
++static inline void
++huaya_set_clip(huayaDriverData *huaya_drv,
++	      huayaDeviceData *huaya_dev,
++	      DFBRegion      *clip     )
++{
++	if (huaya_dev->i_clip)
++		return;
++
++	huaya_dev->clip_rect.x = clip->x1;
++	huaya_dev->clip_rect.w = clip->x2 - clip->x1 + 1;
++	huaya_dev->clip_rect.y = clip->y1;
++	huaya_dev->clip_rect.h = clip->y2 - clip->y1 + 1;
++	huaya_dev->param.clip_rect = &huaya_dev->clip_rect;
++
++	huaya_dev->i_clip = 1;
++}
++
++static inline void
++huaya_set_blend(huayaDriverData *huaya_drv,
++	       huayaDeviceData *huaya_dev,
++	       CardState *state, UINT32      blend)
++{
++	if (huaya_dev->i_blend)
++		return;
++
++/*
++	if (state->mod_hw & (SMF_SRC_BLEND)) {
++		switch (state->src_blend) {
++			case DSBF_ZERO:
++				huaya_dev->param.alpha = 0;
++				blend = GPE_ALPHA_GLOBAL;
++				break;
++			case DSBF_ONE:
++				huaya_dev->param.alpha = 0xFF;
++				blend = GPE_ALPHA_GLOBAL;
++				break;
++			case DSBF_SRCALPHA:
++			default:
++				break;
++		}
++	}
++	else if (state->mod_hw & (SMF_DST_BLEND)) {
++		switch (state->dst_blend) {
++			case DSBF_ONE:
++				huaya_dev->param.alpha = 0;
++				blend = GPE_ALPHA_GLOBAL;
++				break;
++			case DSBF_ZERO:
++				huaya_dev->param.alpha = 0xFF;
++				blend = GPE_ALPHA_GLOBAL;
++				break;
++			case DSBF_INVSRCALPHA:
++			default:
++				break;
++		}
++	}
++*/
++	huaya_dev->param.cmd |= blend;
++	huaya_dev->param.cmd |= GPE_ALPHA_BLEND;
++
++	huaya_dev->i_blend = 1;
++}
++
++static void
++huayaCheckState(void *drv, void *dev,
++	       CardState *state, DFBAccelerationMask accel )
++{
++	switch (state->destination->config.format) {
++	case DSPF_LUT8:
++	case DSPF_ARGB1555:
++	case DSPF_RGB16:
++	case DSPF_RGB32:
++	case DSPF_ARGB:
++	case DSPF_AYUV:
++		break;
++	default:
++		return;
++	}
++
++	if (!(accel & ~HUAYA_SUPPORTED_DRAWINGFUNCTIONS) &&
++	    !(state->drawingflags & ~HUAYA_SUPPORTED_DRAWINGFLAGS))
++		state->accel |= HUAYA_SUPPORTED_DRAWINGFUNCTIONS;
++
++	if (!(accel & ~HUAYA_SUPPORTED_BLITTINGFUNCTIONS) &&
++	    !(state->blittingflags & ~HUAYA_SUPPORTED_BLITTINGFLAGS)) {
++		state->accel |= HUAYA_SUPPORTED_BLITTINGFUNCTIONS;
++		if (DSPF_LUT8 == state->destination->config.format)
++			state->accel &= ~DFXL_STRETCHBLIT;
++	}
++}
++
++static void
++huayaSetState( void *drv, void *dev,
++	      GraphicsDeviceFuncs *funcs,
++	      CardState *state, DFBAccelerationMask accel )
++{
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++
++	huaya_dev->param.cmd = 0;
++	huaya_dev->param.cmd |= GPE_CLIPPER_RECT_IN;
++	if (state->mod_hw) {
++		if ((state->mod_hw & SMF_SOURCE) && state->source)
++			huaya_dev->i_src = 0;
++		if (state->mod_hw & SMF_DESTINATION)
++			huaya_dev->i_dst = 0;
++		if (state->mod_hw & SMF_COLOR)
++			huaya_dev->i_color = 0;
++		if (state->mod_hw & SMF_CLIP)
++			huaya_dev->i_clip = 0;
++		if (state->mod_hw & SMF_SRC_COLORKEY) {
++			huaya_dev->i_src_colorkey = 0;
++		}
++		if (state->mod_hw & SMF_DST_COLORKEY) {
++			huaya_dev->i_dst_colorkey = 0;
++		}
++//		if (state->mod_hw & (SMF_SRC_BLEND | SMF_DST_BLEND))
++//			huaya_dev->i_blend = 0;
++	}
++	switch (accel) {
++	case DFXL_DRAWRECTANGLE:
++	case DFXL_FILLRECTANGLE:
++	case DFXL_FILLTRIANGLE:
++//	case DFXL_DRAWLINE:
++		huaya_set_dest(huaya_drv, huaya_dev, state);
++		huaya_set_color(huaya_drv, huaya_dev, state);
++		huaya_set_clip(huaya_drv, huaya_dev, &state->clip);
++		if (state->drawingflags & DSDRAW_DST_COLORKEY) {
++			huaya_set_dst_colorkey(huaya_drv, huaya_dev, state);
++			huaya_dev->param.cmd |= GPE_DST_COLOR_KEY|GPE_COLOR_KEY_OUT;
++		}
++		if (state->drawingflags & (DSDRAW_BLEND) ) {
++			huaya_dev->i_blend = 0;
++			huaya_dev->param.alpha = state->color.a;
++			huaya_set_blend(huaya_drv, huaya_dev, state, GPE_ALPHA_GLOBAL);
++		}
++		state->set |= DFXL_FILLRECTANGLE | DFXL_DRAWRECTANGLE | DFXL_FILLTRIANGLE;
++		break;
++	case DFXL_BLIT:
++	case DFXL_STRETCHBLIT:
++		huaya_set_src( huaya_drv, huaya_dev, state);
++		huaya_set_dest(huaya_drv, huaya_dev, state);
++		huaya_set_color(huaya_drv, huaya_dev, state);
++		huaya_set_clip(huaya_drv, huaya_dev, &state->clip);
++		if (state->blittingflags & DSBLIT_SRC_COLORKEY) {
++			huaya_set_src_colorkey(huaya_drv, huaya_dev, state);
++			huaya_dev->param.cmd |= GPE_SRC_COLOR_KEY;
++		}
++		else if (state->blittingflags & DSBLIT_DST_COLORKEY) {
++			huaya_set_dst_colorkey(huaya_drv, huaya_dev, state);
++			huaya_dev->param.cmd |= GPE_DST_COLOR_KEY|GPE_COLOR_KEY_OUT;
++		}
++		if (state->blittingflags & (DSBLIT_BLEND_ALPHACHANNEL) ) {
++			huaya_dev->i_blend = 0;
++			if (state->blittingflags & (DSBLIT_SRC_PREMULTIPLY) ) {
++				huaya_dev->param.alpha = 0xFF;
++				huaya_set_blend(huaya_drv, huaya_dev, state, GPE_ALPHA_SRC2_GLOBAL);
++			}
++			else {
++//				huaya_dev->param.alpha = state->color.a;
++				huaya_dev->param.alpha = 0xFF;
++				huaya_set_blend(huaya_drv, huaya_dev, state, GPE_ALPHA_SRC2);
++			}
++		}
++		else if (state->blittingflags & (DSBLIT_BLEND_COLORALPHA)) {
++			huaya_dev->i_blend = 0;
++			huaya_dev->param.alpha = state->color.a;
++			huaya_set_blend(huaya_drv, huaya_dev, state, GPE_ALPHA_GLOBAL);
++		}
++               state->set |= DFXL_BLIT | DFXL_STRETCHBLIT;
++		break;
++	default:
++		D_BUG("unexpected drawing/blitting function");
++	}
++	state->mod_hw = 0;
++}
++
++static bool
++huayaFillRectangle( void *drv, void *dev, DFBRectangle *rect )
++{
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++	struct rectangle gpe_rect;
++
++	if (huaya_dev->dst.pitch > 0xFFFF) {
++		D_BUG("unexpected huayaFillRectangle pitch~0x%x", huaya_dev->dst.pitch);
++		return false;
++	}
++	gpe_rect.x = rect->x;
++	gpe_rect.y = rect->y;
++	gpe_rect.w = rect->w;
++	gpe_rect.h = rect->h;
++	
++	if ( huaya_dev->param.cmd & GPE_CLIPPER_RECT_IN) {
++		if (gpe_rect.x < huaya_dev->clip_rect.x) {
++			gpe_rect.w -= huaya_dev->clip_rect.x - gpe_rect.x;
++			gpe_rect.x = huaya_dev->clip_rect.x;
++		}
++		if (huaya_dev->clip_rect.x + huaya_dev->clip_rect.w < gpe_rect.x + gpe_rect.w)
++			gpe_rect.w = huaya_dev->clip_rect.x + huaya_dev->clip_rect.w - gpe_rect.x;
++		if (gpe_rect.y < huaya_dev->clip_rect.y) {
++			gpe_rect.h -= huaya_dev->clip_rect.y - gpe_rect.y;
++			gpe_rect.y = huaya_dev->clip_rect.y;
++		}
++		if (huaya_dev->clip_rect.y + huaya_dev->clip_rect.h < gpe_rect.y + gpe_rect.h)
++			gpe_rect.h = huaya_dev->clip_rect.y + huaya_dev->clip_rect.h - gpe_rect.y;
++	}
++
++//	gpe_linux_block_fill(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, huaya_dev->color_value, TRUE);
++	huaya_dev->param.cmd |= GPE_DIRECT_FILL_2;
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	huaya_dev->param.cmd &= ~GPE_DIRECT_FILL_2;
++
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++	return true;
++}
++
++static bool
++huayaDrawRectangle( void *drv, void *dev, DFBRectangle *rect )
++{
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++	struct rectangle gpe_rect;
++
++	if (rect->w+rect->h<100) { //smaller rectangle utilizing software.
++		return false;
++	}
++	if (huaya_dev->dst.pitch > 0xFFFF) {
++		D_BUG("unexpected huayaDrawRectangle pitch~0x%x", huaya_dev->dst.pitch);
++		return false;
++	}
++	
++	huaya_dev->param.cmd |= GPE_DIRECT_FILL_2;
++	
++	/* horizontal line 1 */
++	gpe_rect.x = rect->x;
++	gpe_rect.y = rect->y;
++	gpe_rect.w = rect->w;
++	gpe_rect.h = 1;
++//	gpe_linux_block_fill(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, huaya_dev->color_value, TRUE);
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++
++	/* vertical line 1 */
++//	gpe_rect.x = rect->x;
++//	gpe_rect.y = rect->y;
++	gpe_rect.w = 1;
++	gpe_rect.h = rect->h;
++//	gpe_linux_block_fill(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, huaya_dev->color_value, TRUE);
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++
++	/* vertical line 2 */
++	gpe_rect.x = rect->x + rect->w - 1;
++//	gpe_rect.y = rect->y;
++//	gpe_rect.w = 1;
++//	gpe_rect.h = rect->h;
++//	gpe_linux_block_fill(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, huaya_dev->color_value, TRUE);
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++
++	/* horizontal line 2 */
++	gpe_rect.x = rect->x;
++	gpe_rect.y = rect->y + rect->h - 1;
++	gpe_rect.w = rect->w;
++	gpe_rect.h = 1;
++//	gpe_linux_block_fill(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, huaya_dev->color_value, TRUE);
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++
++	huaya_dev->param.cmd &= ~GPE_DIRECT_FILL_2;
++
++	return true;
++}
++
++static bool
++huayaDrawLine( void *drv, void *dev, DFBRegion *line )
++{
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++	struct rectangle src_rect;
++	struct rectangle dst_rect;
++
++	src_rect.x = line->x1;
++	src_rect.y = line->y1;
++	src_rect.w = line->x2;
++	src_rect.h = line->y2;
++	dst_rect.x = line->x1;
++	dst_rect.y = line->y1;
++	dst_rect.w = line->x2;
++	dst_rect.h = line->y2;
++	huaya_dev->param.src_colorkey = &huaya_dev->src_colorkey;
++	huaya_dev->param.cmd |= GPE_DIRECT_FILL_2 | GPE_LINE;
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->dst, &src_rect, &huaya_dev->dst, &dst_rect, &huaya_dev->param);
++	huaya_dev->param.cmd &= ~(GPE_DIRECT_FILL_2 | GPE_LINE);
++
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++	return true;
++}
++
++static bool
++huayaBlit( void *drv, void *dev, DFBRectangle *rect, int dx, int dy )
++{
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++	struct rectangle src_rect;
++	struct rectangle dst_rect;
++	struct rectangle gpe_rect;
++
++	if (huaya_dev->src.pitch > 0xFFFF || huaya_dev->dst.pitch > 0xFFFF) {
++		D_BUG("unexpected huayaBlit pitch~0x%x, 0x%x", huaya_dev->src.pitch, huaya_dev->dst.pitch);
++		return false;
++	}
++	gpe_rect.x = rect->x;
++	gpe_rect.y = rect->y;
++	gpe_rect.w = rect->w;
++	gpe_rect.h = rect->h;
++
++	if (gpe_rect.x < 0) {
++		gpe_rect.w -= -gpe_rect.x;
++		dx += -gpe_rect.x;
++		gpe_rect.x = 0;
++	}
++	if (gpe_rect.y < 0) {
++		gpe_rect.h -= -gpe_rect.y;
++		dy += gpe_rect.y;
++		gpe_rect.y = 0;
++	}
++	if (dx < 0) {
++		gpe_rect.w -= -dx;
++		gpe_rect.x += -dx;
++		dx = 0;
++	}
++	if (dy < 0) {
++		gpe_rect.h -= -dy;
++		gpe_rect.y += -dy;
++		dy = 0;
++	}
++	if ( huaya_dev->param.cmd & GPE_CLIPPER_RECT_IN) {
++		if (dx < huaya_dev->clip_rect.x) {
++			gpe_rect.w = MIN(huaya_dev->clip_rect.w, dx + gpe_rect.w - huaya_dev->clip_rect.x);
++			gpe_rect.x += huaya_dev->clip_rect.x - dx;
++			dx = huaya_dev->clip_rect.x;
++		}
++		if (huaya_dev->clip_rect.x + huaya_dev->clip_rect.w < dx + gpe_rect.w)
++			gpe_rect.w = huaya_dev->clip_rect.x + huaya_dev->clip_rect.w - dx;
++
++		if (dy < huaya_dev->clip_rect.y) {
++			gpe_rect.h = MIN(huaya_dev->clip_rect.h, dy + gpe_rect.h - huaya_dev->clip_rect.y);
++			gpe_rect.y += huaya_dev->clip_rect.y - dy;
++			dy = huaya_dev->clip_rect.y;
++		}
++		if (huaya_dev->clip_rect.y + huaya_dev->clip_rect.h < dy + gpe_rect.h)
++			gpe_rect.h = huaya_dev->clip_rect.y + huaya_dev->clip_rect.h - dy;
++	}
++
++	src_rect.x = gpe_rect.x;
++	src_rect.y = gpe_rect.y;
++	src_rect.w = gpe_rect.w;
++	src_rect.h = gpe_rect.h;
++	dst_rect.x = dx;
++	dst_rect.y = dy;
++	dst_rect.w = gpe_rect.w;
++	dst_rect.h = gpe_rect.h;
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->src, &src_rect, &huaya_dev->dst, &dst_rect, &huaya_dev->param);
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++	return true;
++}
++
++static bool
++huayaStrechBlit( void *drv, void *dev, DFBRectangle *srect, DFBRectangle *drect)
++{
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++	struct rectangle src_rect;
++	struct rectangle dst_rect;
++
++	if (huaya_dev->src.pitch > 0xFFFF || huaya_dev->dst.pitch > 0xFFFF) {
++		D_BUG("unexpected huayaStrechBlit pitch~0x%x, 0x%x", huaya_dev->src.pitch, huaya_dev->dst.pitch);
++		return false;
++	}
++	src_rect.x = srect->x;
++	src_rect.y = srect->y;
++	src_rect.w = srect->w;
++	src_rect.h = srect->h;
++	dst_rect.x = drect->x;
++	dst_rect.y = drect->y;
++	dst_rect.w = drect->w;
++	dst_rect.h = drect->h;
++	
++	if (src_rect.x < 0) {
++		src_rect.w -= -src_rect.x;
++		src_rect.x = 0;
++	}
++	if (src_rect.y < 0) {
++		src_rect.h -= -src_rect.y;
++		src_rect.y = 0;
++	}
++	if (dst_rect.x < 0) {
++		dst_rect.w -= -dst_rect.x;
++		dst_rect.x = 0;
++	}
++	if (dst_rect.y < 0) {
++		dst_rect.h -= -dst_rect.y;
++		dst_rect.y = 0;
++	}
++	huaya_dev->param.cmd |= GPE_SCALE;
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->src, &src_rect, &huaya_dev->dst, &dst_rect, &huaya_dev->param);
++	huaya_dev->param.cmd &= ~GPE_SCALE;
++
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++	return true;
++}
++
++
++/* borrowed heavily and shamelessly from gfxcard.c */
++
++typedef struct {
++   int xi;
++   int xf;
++   int mi;
++   int mf;
++   int _2dy;
++} DDA;
++
++#define SETUP_DDA(xs,ys,xe,ye,dda)         \
++     do {                                  \
++          int dx = xe - xs;                \
++          int dy = ye - ys;                \
++          dda.xi = xs;                     \
++          if (dy != 0) {                   \
++               dda.mi = dx / dy;           \
++               dda.mf = 2*(dx % dy);       \
++               dda.xf = -dy;               \
++               dda._2dy = 2*dy;            \
++               if (dda.mf < 0) {           \
++                    dda.mf += __builtin_mips_absq_s_w(dy)*2;   \
++                    dda.mi--;              \
++               }                           \
++          }                                \
++          else {                           \
++               dda.mi   = 0;               \
++               dda.mf   = 0;               \
++               dda.xf   = 0;               \
++               dda._2dy = 0;               \
++          }                                \
++     } while (0)
++
++
++#define INC_DDA(dda)                       \
++     do {                                  \
++          dda.xi += dda.mi;                \
++          dda.xf += dda.mf;                \
++          if (dda.xf > 0) {                \
++               dda.xi++;                   \
++               dda.xf -= dda._2dy;         \
++          }                                \
++     } while (0)
++
++
++#define GPE_MAX_H	1080
++struct xyl_ins_t 	xyl_arr[GPE_MAX_H];
++/*
++ * The i810fill_tri function takes advantage of the buffer.
++ * It will fill up the buffer until it's done  rendering the
++ * triangle.
++ */
++static inline bool
++huaya_fill_tri( DFBTriangle    *tri,
++	      huayaDriverData *huaya_drv,
++	      huayaDeviceData *huaya_dev )
++{
++	int y, yend;
++	int x = 0xFFFF, x_end = 0;
++	int f_x, f_w;
++
++	DDA dda1, dda2;
++	struct rectangle gpe_rect;
++	struct xyl_ins_t *	xyl_ins = xyl_arr;
++
++	y = tri->y1;
++	yend = tri->y3;
++
++	if (y < huaya_dev->clip_rect.y)
++		y = huaya_dev->clip_rect.y;
++	if (yend > huaya_dev->clip_rect.y + huaya_dev->clip_rect.h)
++		yend = huaya_dev->clip_rect.y + huaya_dev->clip_rect.h;
++	if (yend - y > GPE_MAX_H)
++		yend = y + GPE_MAX_H;
++#if 1
++	SETUP_DDA(tri->x1, tri->y1, tri->x3, tri->y3, dda1);
++	SETUP_DDA(tri->x1, tri->y1, tri->x2, tri->y2, dda2);
++
++	gpe_rect.y = y;
++	gpe_rect.h = yend - y;
++	while (y < yend) {
++		if (y == tri->y2) {
++			if (tri->y2 == tri->y3)
++				break;
++			SETUP_DDA(tri->x2, tri->y2, tri->x3, tri->y3, dda2);
++		}
++
++		f_w = __builtin_mips_absq_s_w(dda1.xi - dda2.xi);
++		f_x = MIN(dda1.xi, dda2.xi);
++
++		if (f_w > 0) {
++			xyl_ins->x = f_x;
++			xyl_ins->y = y;
++			xyl_ins->l = f_w;
++			xyl_ins++;
++			if (f_x < x)
++				x = f_x;
++			if (f_x + f_w > x_end)
++				x_end= f_x + f_w;
++		}
++
++		INC_DDA(dda1);
++		INC_DDA(dda2);
++
++		y++;
++	}
++	y = gpe_rect.y;
++	yend = xyl_ins - xyl_arr;
++	huaya_dev->param.xyl_num = yend;
++	while (yend-- > 0) {
++		xyl_ins--;
++		xyl_ins->x -= x;
++		xyl_ins->y -= y;
++	}
++	gpe_rect.x = x;
++	gpe_rect.w = x_end - x;
++	huaya_dev->param.cmd |= GPE_XYL;
++	huaya_dev->param.color2 = huaya_dev->color_value;
++	huaya_dev->param.xyl_type = XYL_INS_XYL;
++	huaya_dev->param.xyl_ins = xyl_arr;
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->src, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	huaya_dev->param.cmd &= ~GPE_XYL;
++#else
++	x = MIN(tri->x1, tri->x2);
++	x = MIN(tri->x3, x);
++	f_w = __builtin_mips_absq_s_w(x - tri->x1);
++	f_x = __builtin_mips_absq_s_w(x - tri->x2);
++	f_w = MAX(f_x, f_w);
++	f_x = __builtin_mips_absq_s_w(x - tri->x3);
++	f_w = MAX(f_x, f_w);
++	gpe_rect.x = x;
++	gpe_rect.w = f_w + 1;
++	gpe_rect.y = y;
++	gpe_rect.h = yend - y + 1;
++	huaya_dev->param.cmd |= GPE_TRI | GPE_DIRECT_FILL_2;
++	huaya_dev->param.color2 = huaya_dev->color_value;
++	huaya_dev->param.trapezoid_x0 = tri->x1;
++	huaya_dev->param.trapezoid_x1 = tri->x2;
++	huaya_dev->param.trapezoid_x2 = tri->x3;
++	huaya_dev->param.trapezoid_x3 = tri->y2;
++	huaya_dev->param.src_colorkey = &huaya_dev->src_colorkey;
++	gpe_linux_1block_transfer(huaya_dev, huaya_dev->gpe_dev, &huaya_dev->src, &gpe_rect, &huaya_dev->dst, &gpe_rect, &huaya_dev->param);
++	huaya_dev->param.cmd &= ~(GPE_TRI|GPE_DIRECT_FILL_2);
++#endif
++	gpe_linux_wait_hw_end(huaya_dev->gpe_dev);
++	return true;
++}
++
++static bool
++huayaFillTriangle( void *drv, void *dev, DFBTriangle *tri)
++{
++
++	huayaDriverData *huaya_drv = (huayaDriverData *) drv;
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) dev;
++	bool err = true;
++
++	dfb_sort_triangle(tri);
++
++	if (tri->y3 - tri->y1 > 0)
++		err = huaya_fill_tri(tri, huaya_drv, huaya_dev);
++
++
++	return err;
++}
++
++static int
++driver_probe( CoreGraphicsDevice *device )
++{
++	return 1;
++     /*
++     switch (dfb_gfxcard_get_accelerator( device )) {
++          case FB_ACCEL_HUAYA:
++		  return 1;
++     }
++D_DEBUG("===>probe return 0!\n");
++     return 0;*/
++}
++
++
++static void
++driver_get_info( CoreGraphicsDevice *device,
++                 GraphicsDriverInfo *info )
++{
++     /* fill driver info structure */
++     snprintf( info->name,
++               DFB_GRAPHICS_DRIVER_INFO_NAME_LENGTH,
++               "Huaya H2_GPE Driver" );
++
++     snprintf( info->vendor,
++               DFB_GRAPHICS_DRIVER_INFO_VENDOR_LENGTH,
++               "HUAYA" );
++
++     snprintf( info->url,
++               DFB_GRAPHICS_DRIVER_INFO_URL_LENGTH,
++               "http://www.huayamicro.com" );
++
++     snprintf( info->license,
++               DFB_GRAPHICS_DRIVER_INFO_LICENSE_LENGTH,
++               "LGPL" );
++
++     info->version.major = 0;
++     info->version.minor = 5;
++
++     info->driver_data_size = sizeof (huayaDriverData);
++     info->device_data_size = sizeof (huayaDeviceData);
++
++}
++
++static DFBResult
++driver_init_driver( CoreGraphicsDevice  *device,
++                    GraphicsDeviceFuncs *funcs,
++                    void                *driver_data,
++                    void                *device_data,
++                    CoreDFB             *core )
++{
++     DFBResult       ret;
++     huayaDriverData *idrv = driver_data;
++     huayaDeviceData *idev = device_data;
++	struct gpe_device *gpe_dev;
++     idrv->idev = device_data;
++
++	if( (idev->gpe_dev = open("/dev/hy_gpe0", O_RDWR, 0)) < 0 ) {
++		printf("/dev/hy_gpe0 open failed %d\n", idev->gpe_dev);
++		return DFB_FAILURE;
++	}
++
++     funcs->CheckState         = huayaCheckState;
++     funcs->SetState           = huayaSetState;
++     funcs->EngineSync         = huayaEngineSync;
++     funcs->FlushTextureCache  = huayaFlushTextureCache;
++
++     funcs->FillRectangle      = huayaFillRectangle;
++     funcs->DrawRectangle      = huayaDrawRectangle;
++     funcs->Blit               = huayaBlit;
++     funcs->StretchBlit     = huayaStrechBlit;
++     funcs->FillTriangle       = huayaFillTriangle;
++//     funcs->DrawLine = huayaDrawLine;
++
++     return DFB_OK;
++}
++
++static DFBResult
++driver_init_device( CoreGraphicsDevice *device,
++                    GraphicsDeviceInfo *device_info,
++                    void               *driver_data,
++                    void               *device_data )
++{
++     huayaDriverData *idrv = driver_data;
++     huayaDeviceData *idev = device_data;
++
++     /* fill device info */
++     snprintf( device_info->name,
++               DFB_GRAPHICS_DEVICE_INFO_NAME_LENGTH, "GPE_H2" );
++
++     snprintf( device_info->vendor,
++               DFB_GRAPHICS_DEVICE_INFO_VENDOR_LENGTH, "Huaya" );
++
++     device_info->caps.flags    = CCF_CLIPPING;
++     device_info->caps.accel    = HUAYA_SUPPORTED_DRAWINGFUNCTIONS |
++                                  HUAYA_SUPPORTED_BLITTINGFUNCTIONS;
++     device_info->caps.drawing  = HUAYA_SUPPORTED_DRAWINGFLAGS;
++     device_info->caps.blitting = HUAYA_SUPPORTED_BLITTINGFLAGS;
++
++     device_info->limits.surface_byteoffset_alignment = 32 * 4;
++     device_info->limits.surface_pixelpitch_alignment = 32;
++
++     return DFB_OK;
++}
++
++static void
++driver_close_device( CoreGraphicsDevice *device,
++		     void               *driver_data,
++		     void               *device_data )
++{
++	huayaDeviceData *huaya_dev = (huayaDeviceData *) device_data;
++	huayaDriverData *huaya_drv = (huayaDriverData *) driver_data;
++
++    huaya_wait_for_blit_idle( huaya_drv, huaya_dev );
++
++	D_DEBUG( "DirectFB/HUAYA:  %9d huaya_wait_for_blit_idle calls\n",
++		  huaya_dev->idle_calls );
++	D_DEBUG( "DirectFB/HUAYA: Conclusion:\n" );
++
++}
++
++static void
++driver_close_driver( CoreGraphicsDevice *device,
++                     void               *driver_data )
++{
++}
++
+diff -Nru ./DirectFB-1.4.17/gfxdrivers/huaya/huaya.h ./DirectFB-1.4.17-new/gfxdrivers/huaya/huaya.h
+--- ./DirectFB-1.4.17/gfxdrivers/huaya/huaya.h	1970-01-01 08:00:00.000000000 +0800
++++ ./DirectFB-1.4.17-new/gfxdrivers/huaya/huaya.h	2013-03-04 15:12:30.000000000 +0800
+@@ -0,0 +1,83 @@
++/*
++   (c) Copyright 2001-2009  The world wide DirectFB Open Source Community (directfb.org)
++   (c) Copyright 2000-2004  Convergence (integrated media) GmbH
++
++   All rights reserved.
++
++   Written by Antonino Daplas <adaplas@pol.net>
++
++   This library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2 of the License, or (at your option) any later version.
++
++   This library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with this library; if not, write to the
++   Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.
++*/
++
++/*
++ * Intel 810 Chipset Family PRM 15 3.1 
++ * GC Register Memory Address Map 
++ *
++ * Based on:
++ * Intel (R) 810 Chipset Family 
++ * Programmer s Reference Manual 
++ * November 1999 
++ * Revision 1.0 
++ * Order Number: 298026-001 R
++ *
++ * All GC registers are memory-mapped. In addition, the VGA and extended VGA registers 
++ * are I/O mapped. 
++ */
++ 
++#ifndef __HUAYA_H__
++#define __HUAYA_H__
++
++#include <dfb_types.h>
++
++#include <gpe_base.h>
++
++
++/* CMD link list + Pixel buffer + Scale param + Collor matrix + Trapezoid CMD */
++#define BSP_MM_GPE_LEN		0xa00000//(100 * 128 + 800 * 600 * 4 + 128 + 8 * 4 + 600 * 8 + 600 * 16 * 10)
++#define BSP_MM_GPE_STA		(BSP_MM_OSD_STA - BSP_MM_GPE_LEN)
++
++
++typedef struct {
++	INT32	gpe_dev;
++
++    int color_value;
++	struct block_data		src;
++	struct block_data		dst;
++	struct color_key 		src_colorkey;
++	struct color_key 		dst_colorkey;
++	struct rectangle 		clip_rect;		/* clip rect if GPE_CLIPPER_RECT bit is set */
++	struct gpe_parameter param;
++
++    /* state validation */
++	int i_src;
++	int i_dst;
++	int i_color;
++	int i_src_colorkey;
++	int i_dst_colorkey;
++	int i_clip;
++	int i_blend;
++        /* benchmarking */
++	u32 idle_calls;
++} huayaDeviceData;
++
++typedef struct {
++    huayaDeviceData       *idev;
++
++	volatile u8 *mmio_base;
++} huayaDriverData;
++
++
++#endif /* __HUAYA_H__ */
+diff -Nru ./DirectFB-1.4.17/gfxdrivers/huaya/Makefile.am ./DirectFB-1.4.17-new/gfxdrivers/huaya/Makefile.am
+--- ./DirectFB-1.4.17/gfxdrivers/huaya/Makefile.am	1970-01-01 08:00:00.000000000 +0800
++++ ./DirectFB-1.4.17-new/gfxdrivers/huaya/Makefile.am	2013-03-04 15:12:30.000000000 +0800
+@@ -0,0 +1,34 @@
++## Makefile.am for DirectFB/src/core/gfxcards/huaya
++
++INCLUDES = \
++	-I$(top_builddir)/include	\
++	-I$(top_srcdir)/include	\
++	-I$(top_builddir)/lib	\
++	-I$(top_srcdir)/lib	\
++	-I$(top_srcdir)/src	\
++	-I$(top_srcdir)/systems
++
++huaya_LTLIBRARIES = libdirectfb_huaya.la
++
++if BUILD_STATIC
++huaya_DATA = $(i810_LTLIBRARIES:.la=.o)
++endif
++
++huayadir = $(MODULEDIR)/gfxdrivers
++
++libdirectfb_huaya_la_SOURCES =	\
++	huaya.c	\
++	huaya.h 
++
++libdirectfb_huaya_la_LDFLAGS = \
++	-module			\
++	-avoid-version		\
++	$(DFB_LDFLAGS)
++
++libdirectfb_huaya_la_LIBADD = \
++	$(top_builddir)/lib/direct/libdirect.la \
++	$(top_builddir)/src/libdirectfb.la
++
++
++include $(top_srcdir)/rules/libobject.make
++
+diff -Nru ./DirectFB-1.4.17/gfxdrivers/huaya/Makefile.in ./DirectFB-1.4.17-new/gfxdrivers/huaya/Makefile.in
+--- ./DirectFB-1.4.17/gfxdrivers/huaya/Makefile.in	1970-01-01 08:00:00.000000000 +0800
++++ ./DirectFB-1.4.17-new/gfxdrivers/huaya/Makefile.in	2012-07-13 15:52:44.787656000 +0800
+@@ -0,0 +1,685 @@
++# Makefile.in generated by automake 1.11.1 from Makefile.am.
++# @configure_input@
++
++# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
++# 2003, 2004, 2005, 2006, 2007, 2008, 2009  Free Software Foundation,
++# Inc.
++# This Makefile.in is free software; the Free Software Foundation
++# gives unlimited permission to copy and/or distribute it,
++# with or without modifications, as long as this notice is preserved.
++
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
++# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
++# PARTICULAR PURPOSE.
++
++@SET_MAKE@
++
++
++VPATH = @srcdir@
++pkgdatadir = $(datadir)/@PACKAGE@
++pkgincludedir = $(includedir)/@PACKAGE@
++pkglibdir = $(libdir)/@PACKAGE@
++pkglibexecdir = $(libexecdir)/@PACKAGE@
++am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
++install_sh_DATA = $(install_sh) -c -m 644
++install_sh_PROGRAM = $(install_sh) -c
++install_sh_SCRIPT = $(install_sh) -c
++INSTALL_HEADER = $(INSTALL_DATA)
++transform = $(program_transform_name)
++NORMAL_INSTALL = :
++PRE_INSTALL = :
++POST_INSTALL = :
++NORMAL_UNINSTALL = :
++PRE_UNINSTALL = :
++POST_UNINSTALL = :
++build_triplet = @build@
++host_triplet = @host@
++target_triplet = @target@
++DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
++	$(top_srcdir)/rules/libobject.make
++subdir = gfxdrivers/huaya
++ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
++am__aclocal_m4_deps = $(top_srcdir)/m4/as-ac-expand.m4 \
++	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
++	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
++	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.in
++am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
++	$(ACLOCAL_M4)
++mkinstalldirs = $(install_sh) -d
++CONFIG_HEADER = $(top_builddir)/config.h
++CONFIG_CLEAN_FILES =
++CONFIG_CLEAN_VPATH_FILES =
++am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
++am__vpath_adj = case $$p in \
++    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
++    *) f=$$p;; \
++  esac;
++am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
++am__install_max = 40
++am__nobase_strip_setup = \
++  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
++am__nobase_strip = \
++  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
++am__nobase_list = $(am__nobase_strip_setup); \
++  for p in $$list; do echo "$$p $$p"; done | \
++  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
++  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
++    if (++n[$$2] == $(am__install_max)) \
++      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
++    END { for (dir in files) print dir, files[dir] }'
++am__base_list = \
++  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
++  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
++am__installdirs = "$(DESTDIR)$(huayadir)" "$(DESTDIR)$(huayadir)"
++LTLIBRARIES = $(huaya_LTLIBRARIES)
++libdirectfb_huaya_la_DEPENDENCIES =  \
++	$(top_builddir)/lib/direct/libdirect.la \
++	$(top_builddir)/src/libdirectfb.la
++am_libdirectfb_huaya_la_OBJECTS = huaya.lo
++libdirectfb_huaya_la_OBJECTS = $(am_libdirectfb_huaya_la_OBJECTS)
++AM_V_lt = $(am__v_lt_$(V))
++am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
++am__v_lt_0 = --silent
++libdirectfb_huaya_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
++	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
++	$(AM_CFLAGS) $(CFLAGS) $(libdirectfb_huaya_la_LDFLAGS) \
++	$(LDFLAGS) -o $@
++DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
++depcomp = $(SHELL) $(top_srcdir)/depcomp
++am__depfiles_maybe = depfiles
++am__mv = mv -f
++COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
++	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
++LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
++	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
++	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
++	$(AM_CFLAGS) $(CFLAGS)
++AM_V_CC = $(am__v_CC_$(V))
++am__v_CC_ = $(am__v_CC_$(AM_DEFAULT_VERBOSITY))
++am__v_CC_0 = @echo "  CC    " $@;
++AM_V_at = $(am__v_at_$(V))
++am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
++am__v_at_0 = @
++CCLD = $(CC)
++LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
++	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
++	$(AM_LDFLAGS) $(LDFLAGS) -o $@
++AM_V_CCLD = $(am__v_CCLD_$(V))
++am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
++am__v_CCLD_0 = @echo "  CCLD  " $@;
++AM_V_GEN = $(am__v_GEN_$(V))
++am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
++am__v_GEN_0 = @echo "  GEN   " $@;
++SOURCES = $(libdirectfb_huaya_la_SOURCES)
++DIST_SOURCES = $(libdirectfb_huaya_la_SOURCES)
++DATA = $(huaya_DATA)
++ETAGS = etags
++CTAGS = ctags
++DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
++ACLOCAL = @ACLOCAL@
++AMTAR = @AMTAR@
++AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
++AR = @AR@
++AS = @AS@
++ASFLAGS = @ASFLAGS@
++AUTOCONF = @AUTOCONF@
++AUTOHEADER = @AUTOHEADER@
++AUTOMAKE = @AUTOMAKE@
++AWK = @AWK@
++CC = @CC@
++CCAS = @CCAS@
++CCASDEPMODE = @CCASDEPMODE@
++CCASFLAGS = @CCASFLAGS@
++CCDEPMODE = @CCDEPMODE@
++CFLAGS = @CFLAGS@
++CPP = @CPP@
++CPPFLAGS = @CPPFLAGS@
++CXX = @CXX@
++CXXCPP = @CXXCPP@
++CXXDEPMODE = @CXXDEPMODE@
++CXXFLAGS = @CXXFLAGS@
++CYGPATH_W = @CYGPATH_W@
++DATADIR = @DATADIR@
++DEFS = @DEFS@
++DEPDIR = @DEPDIR@
++DEP_VOODOO = @DEP_VOODOO@
++DFB_CFLAGS_OMIT_FRAME_POINTER = @DFB_CFLAGS_OMIT_FRAME_POINTER@
++DFB_INTERNAL_CFLAGS = @DFB_INTERNAL_CFLAGS@
++DFB_LDFLAGS = @DFB_LDFLAGS@
++DFB_SMOOTH_SCALING = @DFB_SMOOTH_SCALING@
++DIRECTFB_BINARY_AGE = @DIRECTFB_BINARY_AGE@
++DIRECTFB_BUILD_PURE_VOODOO = @DIRECTFB_BUILD_PURE_VOODOO@
++DIRECTFB_BUILD_VOODOO = @DIRECTFB_BUILD_VOODOO@
++DIRECTFB_CSOURCE = @DIRECTFB_CSOURCE@
++DIRECTFB_INTERFACE_AGE = @DIRECTFB_INTERFACE_AGE@
++DIRECTFB_MAJOR_VERSION = @DIRECTFB_MAJOR_VERSION@
++DIRECTFB_MICRO_VERSION = @DIRECTFB_MICRO_VERSION@
++DIRECTFB_MINOR_VERSION = @DIRECTFB_MINOR_VERSION@
++DIRECTFB_VERSION = @DIRECTFB_VERSION@
++DIRECT_BUILD_DEBUG = @DIRECT_BUILD_DEBUG@
++DIRECT_BUILD_DEBUGS = @DIRECT_BUILD_DEBUGS@
++DIRECT_BUILD_GETTID = @DIRECT_BUILD_GETTID@
++DIRECT_BUILD_NETWORK = @DIRECT_BUILD_NETWORK@
++DIRECT_BUILD_STDBOOL = @DIRECT_BUILD_STDBOOL@
++DIRECT_BUILD_TEXT = @DIRECT_BUILD_TEXT@
++DIRECT_BUILD_TRACE = @DIRECT_BUILD_TRACE@
++DSYMUTIL = @DSYMUTIL@
++DUMPBIN = @DUMPBIN@
++DYNLIB = @DYNLIB@
++ECHO_C = @ECHO_C@
++ECHO_N = @ECHO_N@
++ECHO_T = @ECHO_T@
++EGREP = @EGREP@
++EXEEXT = @EXEEXT@
++FGREP = @FGREP@
++FLUXCOMP = @FLUXCOMP@
++FREETYPE_CFLAGS = @FREETYPE_CFLAGS@
++FREETYPE_LIBS = @FREETYPE_LIBS@
++FREETYPE_PROVIDER = @FREETYPE_PROVIDER@
++FUSION_BUILD_KERNEL = @FUSION_BUILD_KERNEL@
++FUSION_BUILD_MULTI = @FUSION_BUILD_MULTI@
++FUSION_MESSAGE_SIZE = @FUSION_MESSAGE_SIZE@
++GIF_PROVIDER = @GIF_PROVIDER@
++GREP = @GREP@
++HAVE_LINUX = @HAVE_LINUX@
++INCLUDEDIR = @INCLUDEDIR@
++INSTALL = @INSTALL@
++INSTALL_DATA = @INSTALL_DATA@
++INSTALL_PROGRAM = @INSTALL_PROGRAM@
++INSTALL_SCRIPT = @INSTALL_SCRIPT@
++INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
++INTERNALINCLUDEDIR = @INTERNALINCLUDEDIR@
++JPEG_PROVIDER = @JPEG_PROVIDER@
++LD = @LD@
++LDFLAGS = @LDFLAGS@
++LIBJPEG = @LIBJPEG@
++LIBM = @LIBM@
++LIBOBJS = @LIBOBJS@
++LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
++LIBPNG_LIBS = @LIBPNG_LIBS@
++LIBS = @LIBS@
++LIBTOOL = @LIBTOOL@
++LINOTYPE_CFLAGS = @LINOTYPE_CFLAGS@
++LINOTYPE_LIBS = @LINOTYPE_LIBS@
++LIPO = @LIPO@
++LN_S = @LN_S@
++LTLIBOBJS = @LTLIBOBJS@
++LT_AGE = @LT_AGE@
++LT_BINARY = @LT_BINARY@
++LT_CURRENT = @LT_CURRENT@
++LT_RELEASE = @LT_RELEASE@
++LT_REVISION = @LT_REVISION@
++MAINT = @MAINT@
++MAKEINFO = @MAKEINFO@
++MAN2HTML = @MAN2HTML@
++MKDIR_P = @MKDIR_P@
++MODULEDIR = @MODULEDIR@
++MODULEDIRNAME = @MODULEDIRNAME@
++NM = @NM@
++NMEDIT = @NMEDIT@
++OBJDUMP = @OBJDUMP@
++OBJEXT = @OBJEXT@
++OSX_LIBS = @OSX_LIBS@
++OTOOL = @OTOOL@
++OTOOL64 = @OTOOL64@
++PACKAGE = @PACKAGE@
++PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
++PACKAGE_NAME = @PACKAGE_NAME@
++PACKAGE_STRING = @PACKAGE_STRING@
++PACKAGE_TARNAME = @PACKAGE_TARNAME@
++PACKAGE_URL = @PACKAGE_URL@
++PACKAGE_VERSION = @PACKAGE_VERSION@
++PATH_SEPARATOR = @PATH_SEPARATOR@
++PERL = @PERL@
++PKG_CONFIG = @PKG_CONFIG@
++PNG_PROVIDER = @PNG_PROVIDER@
++RANLIB = @RANLIB@
++RUNTIME_SYSROOT = @RUNTIME_SYSROOT@
++SDL_CFLAGS = @SDL_CFLAGS@
++SDL_LIBS = @SDL_LIBS@
++SED = @SED@
++SET_MAKE = @SET_MAKE@
++SH772X_DEP_CFLAGS = @SH772X_DEP_CFLAGS@
++SH772X_DEP_LIBS = @SH772X_DEP_LIBS@
++SH772X_SHJPEG_DEP_CFLAGS = @SH772X_SHJPEG_DEP_CFLAGS@
++SH772X_SHJPEG_DEP_LIBS = @SH772X_SHJPEG_DEP_LIBS@
++SHELL = @SHELL@
++SOPATH = @SOPATH@
++STRIP = @STRIP@
++SYSCONFDIR = @SYSCONFDIR@
++SYSFS_LIBS = @SYSFS_LIBS@
++THREADFLAGS = @THREADFLAGS@
++THREADLIB = @THREADLIB@
++TSLIB_CFLAGS = @TSLIB_CFLAGS@
++TSLIB_LIBS = @TSLIB_LIBS@
++VERSION = @VERSION@
++VNC_CFLAGS = @VNC_CFLAGS@
++VNC_CONFIG = @VNC_CONFIG@
++VNC_LIBS = @VNC_LIBS@
++VOODOO_BUILD_NO_SETSOCKOPT = @VOODOO_BUILD_NO_SETSOCKOPT@
++X11_CFLAGS = @X11_CFLAGS@
++X11_LIBS = @X11_LIBS@
++ZLIB_LIBS = @ZLIB_LIBS@
++abs_builddir = @abs_builddir@
++abs_srcdir = @abs_srcdir@
++abs_top_builddir = @abs_top_builddir@
++abs_top_srcdir = @abs_top_srcdir@
++ac_ct_CC = @ac_ct_CC@
++ac_ct_CXX = @ac_ct_CXX@
++ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
++am__include = @am__include@
++am__leading_dot = @am__leading_dot@
++am__quote = @am__quote@
++am__tar = @am__tar@
++am__untar = @am__untar@
++bindir = @bindir@
++build = @build@
++build_alias = @build_alias@
++build_cpu = @build_cpu@
++build_os = @build_os@
++build_vendor = @build_vendor@
++builddir = @builddir@
++datadir = @datadir@
++datarootdir = @datarootdir@
++docdir = @docdir@
++dvidir = @dvidir@
++exec_prefix = @exec_prefix@
++host = @host@
++host_alias = @host_alias@
++host_cpu = @host_cpu@
++host_os = @host_os@
++host_vendor = @host_vendor@
++htmldir = @htmldir@
++includedir = @includedir@
++infodir = @infodir@
++install_sh = @install_sh@
++libdir = @libdir@
++libexecdir = @libexecdir@
++localedir = @localedir@
++localstatedir = @localstatedir@
++lt_ECHO = @lt_ECHO@
++mandir = @mandir@
++mkdir_p = @mkdir_p@
++oldincludedir = @oldincludedir@
++pdfdir = @pdfdir@
++prefix = @prefix@
++program_transform_name = @program_transform_name@
++psdir = @psdir@
++sbindir = @sbindir@
++sharedstatedir = @sharedstatedir@
++srcdir = @srcdir@
++sysconfdir = @sysconfdir@
++target = @target@
++target_alias = @target_alias@
++target_cpu = @target_cpu@
++target_os = @target_os@
++target_vendor = @target_vendor@
++top_build_prefix = @top_build_prefix@
++top_builddir = @top_builddir@
++top_srcdir = @top_srcdir@
++INCLUDES = \
++	-I$(top_builddir)/include	\
++	-I$(top_srcdir)/include	\
++	-I$(top_builddir)/lib	\
++	-I$(top_srcdir)/lib	\
++	-I$(top_srcdir)/src	\
++	-I$(top_srcdir)/systems
++
++huaya_LTLIBRARIES = libdirectfb_huaya.la
++@BUILD_STATIC_TRUE@huaya_DATA = $(i810_LTLIBRARIES:.la=.o)
++huayadir = $(MODULEDIR)/gfxdrivers
++libdirectfb_huaya_la_SOURCES = \
++	huaya.c	\
++	huaya.h 
++
++libdirectfb_huaya_la_LDFLAGS = \
++	-module			\
++	-avoid-version		\
++	$(DFB_LDFLAGS)
++
++libdirectfb_huaya_la_LIBADD = \
++	$(top_builddir)/lib/direct/libdirect.la \
++	$(top_builddir)/src/libdirectfb.la
++
++all: all-am
++
++.SUFFIXES:
++.SUFFIXES: .c .lo .o .obj
++$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/rules/libobject.make $(am__configure_deps)
++	@for dep in $?; do \
++	  case '$(am__configure_deps)' in \
++	    *$$dep*) \
++	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
++	        && { if test -f $@; then exit 0; else break; fi; }; \
++	      exit 1;; \
++	  esac; \
++	done; \
++	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu gfxdrivers/huaya/Makefile'; \
++	$(am__cd) $(top_srcdir) && \
++	  $(AUTOMAKE) --gnu gfxdrivers/huaya/Makefile
++.PRECIOUS: Makefile
++Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
++	@case '$?' in \
++	  *config.status*) \
++	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
++	  *) \
++	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
++	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
++	esac;
++
++$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
++	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
++
++$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
++	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
++$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
++	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
++$(am__aclocal_m4_deps):
++install-huayaLTLIBRARIES: $(huaya_LTLIBRARIES)
++	@$(NORMAL_INSTALL)
++	test -z "$(huayadir)" || $(MKDIR_P) "$(DESTDIR)$(huayadir)"
++	@list='$(huaya_LTLIBRARIES)'; test -n "$(huayadir)" || list=; \
++	list2=; for p in $$list; do \
++	  if test -f $$p; then \
++	    list2="$$list2 $$p"; \
++	  else :; fi; \
++	done; \
++	test -z "$$list2" || { \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(huayadir)'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(huayadir)"; \
++	}
++
++uninstall-huayaLTLIBRARIES:
++	@$(NORMAL_UNINSTALL)
++	@list='$(huaya_LTLIBRARIES)'; test -n "$(huayadir)" || list=; \
++	for p in $$list; do \
++	  $(am__strip_dir) \
++	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(huayadir)/$$f'"; \
++	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(huayadir)/$$f"; \
++	done
++
++clean-huayaLTLIBRARIES:
++	-test -z "$(huaya_LTLIBRARIES)" || rm -f $(huaya_LTLIBRARIES)
++	@list='$(huaya_LTLIBRARIES)'; for p in $$list; do \
++	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
++	  test "$$dir" != "$$p" || dir=.; \
++	  echo "rm -f \"$${dir}/so_locations\""; \
++	  rm -f "$${dir}/so_locations"; \
++	done
++libdirectfb_huaya.la: $(libdirectfb_huaya_la_OBJECTS) $(libdirectfb_huaya_la_DEPENDENCIES) 
++	$(AM_V_CCLD)$(libdirectfb_huaya_la_LINK) -rpath $(huayadir) $(libdirectfb_huaya_la_OBJECTS) $(libdirectfb_huaya_la_LIBADD) $(LIBS)
++
++mostlyclean-compile:
++	-rm -f *.$(OBJEXT)
++
++distclean-compile:
++	-rm -f *.tab.c
++
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/huaya.Plo@am__quote@
++
++.c.o:
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
++@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(COMPILE) -c $<
++
++.c.obj:
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
++@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
++
++.c.lo:
++@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
++@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
++@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
++
++mostlyclean-libtool:
++	-rm -f *.lo
++
++clean-libtool:
++	-rm -rf .libs _libs
++install-huayaDATA: $(huaya_DATA)
++	@$(NORMAL_INSTALL)
++	test -z "$(huayadir)" || $(MKDIR_P) "$(DESTDIR)$(huayadir)"
++	@list='$(huaya_DATA)'; test -n "$(huayadir)" || list=; \
++	for p in $$list; do \
++	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
++	  echo "$$d$$p"; \
++	done | $(am__base_list) | \
++	while read files; do \
++	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(huayadir)'"; \
++	  $(INSTALL_DATA) $$files "$(DESTDIR)$(huayadir)" || exit $$?; \
++	done
++
++uninstall-huayaDATA:
++	@$(NORMAL_UNINSTALL)
++	@list='$(huaya_DATA)'; test -n "$(huayadir)" || list=; \
++	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
++	test -n "$$files" || exit 0; \
++	echo " ( cd '$(DESTDIR)$(huayadir)' && rm -f" $$files ")"; \
++	cd "$(DESTDIR)$(huayadir)" && rm -f $$files
++
++ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
++	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
++	unique=`for i in $$list; do \
++	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
++	  done | \
++	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
++	      END { if (nonempty) { for (i in files) print i; }; }'`; \
++	mkid -fID $$unique
++tags: TAGS
++
++TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
++		$(TAGS_FILES) $(LISP)
++	set x; \
++	here=`pwd`; \
++	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
++	unique=`for i in $$list; do \
++	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
++	  done | \
++	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
++	      END { if (nonempty) { for (i in files) print i; }; }'`; \
++	shift; \
++	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
++	  test -n "$$unique" || unique=$$empty_fix; \
++	  if test $$# -gt 0; then \
++	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
++	      "$$@" $$unique; \
++	  else \
++	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
++	      $$unique; \
++	  fi; \
++	fi
++ctags: CTAGS
++CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
++		$(TAGS_FILES) $(LISP)
++	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
++	unique=`for i in $$list; do \
++	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
++	  done | \
++	  $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
++	      END { if (nonempty) { for (i in files) print i; }; }'`; \
++	test -z "$(CTAGS_ARGS)$$unique" \
++	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
++	     $$unique
++
++GTAGS:
++	here=`$(am__cd) $(top_builddir) && pwd` \
++	  && $(am__cd) $(top_srcdir) \
++	  && gtags -i $(GTAGS_ARGS) "$$here"
++
++distclean-tags:
++	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
++
++distdir: $(DISTFILES)
++	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
++	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
++	list='$(DISTFILES)'; \
++	  dist_files=`for file in $$list; do echo $$file; done | \
++	  sed -e "s|^$$srcdirstrip/||;t" \
++	      -e "s|^$$topsrcdirstrip/|$(top_builddir)/|;t"`; \
++	case $$dist_files in \
++	  */*) $(MKDIR_P) `echo "$$dist_files" | \
++			   sed '/\//!d;s|^|$(distdir)/|;s,/[^/]*$$,,' | \
++			   sort -u` ;; \
++	esac; \
++	for file in $$dist_files; do \
++	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
++	  if test -d $$d/$$file; then \
++	    dir=`echo "/$$file" | sed -e 's,/[^/]*$$,,'`; \
++	    if test -d "$(distdir)/$$file"; then \
++	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
++	    fi; \
++	    if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
++	      cp -fpR $(srcdir)/$$file "$(distdir)$$dir" || exit 1; \
++	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
++	    fi; \
++	    cp -fpR $$d/$$file "$(distdir)$$dir" || exit 1; \
++	  else \
++	    test -f "$(distdir)/$$file" \
++	    || cp -p $$d/$$file "$(distdir)/$$file" \
++	    || exit 1; \
++	  fi; \
++	done
++check-am: all-am
++check: check-am
++all-am: Makefile $(LTLIBRARIES) $(DATA)
++installdirs:
++	for dir in "$(DESTDIR)$(huayadir)" "$(DESTDIR)$(huayadir)"; do \
++	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
++	done
++install: install-am
++install-exec: install-exec-am
++install-data: install-data-am
++uninstall: uninstall-am
++
++install-am: all-am
++	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
++
++installcheck: installcheck-am
++install-strip:
++	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
++	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
++	  `test -z '$(STRIP)' || \
++	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
++mostlyclean-generic:
++
++clean-generic:
++
++distclean-generic:
++	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
++	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
++
++maintainer-clean-generic:
++	@echo "This command is intended for maintainers to use"
++	@echo "it deletes files that may require special tools to rebuild."
++clean: clean-am
++
++clean-am: clean-generic clean-huayaLTLIBRARIES clean-libtool \
++	mostlyclean-am
++
++distclean: distclean-am
++	-rm -rf ./$(DEPDIR)
++	-rm -f Makefile
++distclean-am: clean-am distclean-compile distclean-generic \
++	distclean-tags
++
++dvi: dvi-am
++
++dvi-am:
++
++html: html-am
++
++html-am:
++
++info: info-am
++
++info-am:
++
++install-data-am: install-huayaDATA install-huayaLTLIBRARIES
++
++install-dvi: install-dvi-am
++
++install-dvi-am:
++
++install-exec-am:
++
++install-html: install-html-am
++
++install-html-am:
++
++install-info: install-info-am
++
++install-info-am:
++
++install-man:
++
++install-pdf: install-pdf-am
++
++install-pdf-am:
++
++install-ps: install-ps-am
++
++install-ps-am:
++
++installcheck-am:
++
++maintainer-clean: maintainer-clean-am
++	-rm -rf ./$(DEPDIR)
++	-rm -f Makefile
++maintainer-clean-am: distclean-am maintainer-clean-generic
++
++mostlyclean: mostlyclean-am
++
++mostlyclean-am: mostlyclean-compile mostlyclean-generic \
++	mostlyclean-libtool
++
++pdf: pdf-am
++
++pdf-am:
++
++ps: ps-am
++
++ps-am:
++
++uninstall-am: uninstall-huayaDATA uninstall-huayaLTLIBRARIES
++
++.MAKE: install-am install-strip
++
++.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
++	clean-huayaLTLIBRARIES clean-libtool ctags distclean \
++	distclean-compile distclean-generic distclean-libtool \
++	distclean-tags distdir dvi dvi-am html html-am info info-am \
++	install install-am install-data install-data-am install-dvi \
++	install-dvi-am install-exec install-exec-am install-html \
++	install-html-am install-huayaDATA install-huayaLTLIBRARIES \
++	install-info install-info-am install-man install-pdf \
++	install-pdf-am install-ps install-ps-am install-strip \
++	installcheck installcheck-am installdirs maintainer-clean \
++	maintainer-clean-generic mostlyclean mostlyclean-compile \
++	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
++	tags uninstall uninstall-am uninstall-huayaDATA \
++	uninstall-huayaLTLIBRARIES
++
++%.o: .libs/%.a %.la
++	rm -f $<.tmp/*.o
++	if test -d $<.tmp; then rmdir $<.tmp; fi
++	mkdir $<.tmp
++	(cd $<.tmp && $(AR) x ../../$<)
++	$(LD) -o $@ -r $<.tmp/*.o
++	rm -f $<.tmp/*.o && rmdir $<.tmp
++
++.PHONY: $(LTLIBRARIES:%.la=.libs/%.a)
++
++# Tell versions [3.59,3.63) of GNU make to not export all variables.
++# Otherwise a system limit (for SysV at least) may be exceeded.
++.NOEXPORT:
+diff -Nru ./DirectFB-1.4.17/gfxdrivers/Makefile.am ./DirectFB-1.4.17-new/gfxdrivers/Makefile.am
+--- ./DirectFB-1.4.17/gfxdrivers/Makefile.am	2012-05-23 21:43:12.000000000 +0800
++++ ./DirectFB-1.4.17-new/gfxdrivers/Makefile.am	2013-03-04 15:12:57.000000000 +0800
+@@ -132,6 +132,12 @@
+ EP9X_DIR =
+ endif
+ 
++if GFX_HUAYA
++HUAYA_DIR = huaya
++else
++HUAYA_DIR =
++endif
++
+ 
+ SUBDIRS = \
+ 	$(ATI128_DIR)	\
+@@ -155,4 +161,5 @@
+ 	$(SIS315_DIR)	\
+ 	$(TDFX_DIR)	\
+ 	$(UNICHROME_DIR) \
+-	$(VMWARE_DIR)
++	$(VMWARE_DIR)	\
++	$(HUAYA_DIR)
+diff -Nru ./DirectFB-1.4.17/gfxdrivers/Makefile.in ./DirectFB-1.4.17-new/gfxdrivers/Makefile.in
+--- ./DirectFB-1.4.17/gfxdrivers/Makefile.in	2012-05-23 21:45:16.000000000 +0800
++++ ./DirectFB-1.4.17-new/gfxdrivers/Makefile.in	2013-03-04 16:09:16.440748234 +0800
+@@ -69,7 +69,7 @@
+ CTAGS = ctags
+ DIST_SUBDIRS = ati128 cle266 cyber5k davinci ep9x gl i810 i830 mach64 \
+ 	matrox neomagic nsc nvidia omap pxa3xx radeon savage sh772x \
+-	sis315 tdfx unichrome vmware
++	sis315 tdfx unichrome vmware huaya
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ am__relativize = \
+   dir0=`pwd`; \
+@@ -345,6 +345,8 @@
+ @GFX_VMWARE_TRUE@VMWARE_DIR = vmware
+ @GFX_EP9X_FALSE@EP9X_DIR = 
+ @GFX_EP9X_TRUE@EP9X_DIR = ep9x
++@GFX_HUAYA_FALSE@HUAYA_DIR = 
++@GFX_HUAYA_TRUE@HUAYA_DIR = huaya
+ SUBDIRS = \
+ 	$(ATI128_DIR)	\
+ 	$(CLE266_DIR)	\
+@@ -367,7 +369,8 @@
+ 	$(SIS315_DIR)	\
+ 	$(TDFX_DIR)	\
+ 	$(UNICHROME_DIR) \
+-	$(VMWARE_DIR)
++	$(VMWARE_DIR)	\
++	$(HUAYA_DIR)
+ 
+ all: all-recursive
+ 

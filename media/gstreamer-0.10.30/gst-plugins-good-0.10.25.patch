@@ -1,0 +1,261 @@
+diff -ruaN ./gst-plugins-good-0.10.25/sys/v4l2/gstv4l2bufferpool.c gst-plugins-good-0.10.25.mod/sys/v4l2/gstv4l2bufferpool.c
+--- ./gst-plugins-good-0.10.25/sys/v4l2/gstv4l2bufferpool.c	2010-05-14 08:40:17.000000000 +0800
++++ gst-plugins-good-0.10.25.mod/sys/v4l2/gstv4l2bufferpool.c	2011-05-21 18:27:39.035359980 +0800
+@@ -74,6 +74,7 @@
+        * w.r.t. destruction of the pool, since the buffer is still live and
+        * the buffer holds a ref to the pool..
+        */
++printf("queue_push<%d>\n",index);
+       g_async_queue_push (pool->avail_buffers, buffer);
+     }
+   } else {
+@@ -170,13 +171,22 @@
+   GST_LOG_OBJECT (pool->v4l2elem, "  length:    %u", ret->vbuffer.length);
+   GST_LOG_OBJECT (pool->v4l2elem, "  input:     %u", ret->vbuffer.input);
+ 
++#if 0
+   data = (guint8 *) v4l2_mmap (0, ret->vbuffer.length,
+       PROT_READ | PROT_WRITE, MAP_SHARED, pool->video_fd,
+       ret->vbuffer.m.offset);
++#else
++  data = (guint8 *) v4l2_mmap (0, ret->vbuffer.length,
++      PROT_READ | PROT_WRITE, MAP_SHARED, pool->video_fd,
++      ret->vbuffer.m.offset);
++  //data = ret->vbuffer.m.offset+0x10000000;//steve ,test only
+ 
++#endif
+   if (data == MAP_FAILED)
+     goto mmap_failed;
+ 
++GST_BUFFER_CAST(ret)->_gst_reserved[0] = ret->vbuffer.m.offset + 0x10000000;
++
+   GST_BUFFER_DATA (ret) = data;
+   GST_BUFFER_SIZE (ret) = ret->vbuffer.length;
+ 
+@@ -365,6 +375,7 @@
+     if (!pool->buffers[n])
+       goto buffer_new_failed;
+     pool->num_live_buffers++;
++printf("queue_push<%d>\n",n);
+     g_async_queue_push (pool->avail_buffers, pool->buffers[n]);
+   }
+ 
+@@ -460,9 +471,10 @@
+ gst_v4l2_buffer_pool_get (GstV4l2BufferPool * pool)
+ {
+   GstV4l2Buffer *buf = g_async_queue_try_pop (pool->avail_buffers);
+-
+-  if (buf)
++  if (buf) {
+     GST_BUFFER_SIZE (buf) = buf->vbuffer.length;
++    printf("queue_pop<%d>\n",buf->vbuffer.index);
++  }
+ 
+   pool->running = TRUE;
+ 
+@@ -483,10 +495,10 @@
+ gst_v4l2_buffer_pool_qbuf (GstV4l2BufferPool * pool, GstV4l2Buffer * buf)
+ {
+   GST_LOG_OBJECT (pool->v4l2elem, "enqueue pool buffer %d", buf->vbuffer.index);
+-
++printf("pool_qbuf_begin<%x>\n",buf);
+   if (v4l2_ioctl (pool->video_fd, VIDIOC_QBUF, &buf->vbuffer) < 0)
+     return FALSE;
+-
++printf("pool_qbuf_end\n");
+   pool->num_live_buffers--;
+   GST_DEBUG_OBJECT (pool->v4l2elem, "num_live_buffers--: %d",
+       pool->num_live_buffers);
+diff -ruaN ./gst-plugins-good-0.10.25/sys/v4l2/gstv4l2object.c gst-plugins-good-0.10.25.mod/sys/v4l2/gstv4l2object.c
+--- ./gst-plugins-good-0.10.25/sys/v4l2/gstv4l2object.c	2010-09-03 02:22:25.000000000 +0800
++++ gst-plugins-good-0.10.25.mod/sys/v4l2/gstv4l2object.c	2011-05-21 18:27:39.043359988 +0800
+@@ -1236,6 +1236,7 @@
+ 
+   if (!strcmp (mimetype, "video/x-raw-yuv")) {
+     gst_structure_get_fourcc (structure, "format", &fourcc);
++    printf("video/x-raw-yuv:fourcc<0x%x>\n",fourcc);
+ 
+     switch (fourcc) {
+       case GST_MAKE_FOURCC ('I', '4', '2', '0'):
+@@ -1294,7 +1295,7 @@
+     gst_structure_get_int (structure, "depth", &depth);
+     gst_structure_get_int (structure, "endianness", &endianness);
+     gst_structure_get_int (structure, "red_mask", &r_mask);
+-
++    printf("video/x-raw-rgb:depth<%d>\n",depth);
+     switch (depth) {
+       case 8:
+         fourcc = V4L2_PIX_FMT_RGB332;
+@@ -1976,6 +1977,7 @@
+ gboolean
+ gst_v4l2_object_start_streaming (GstV4l2Object * v4l2object)
+ {
++printf("startstreaming\n");
+   if (v4l2_ioctl (v4l2object->video_fd, VIDIOC_STREAMON,
+           &(v4l2object->type)) < 0) {
+     GST_ELEMENT_ERROR (v4l2object->element, RESOURCE, OPEN_READ,
+@@ -1989,6 +1991,7 @@
+ gboolean
+ gst_v4l2_object_stop_streaming (GstV4l2Object * v4l2object)
+ {
++printf("stoptreaming\n");
+   if (v4l2_ioctl (v4l2object->video_fd, VIDIOC_STREAMOFF,
+           &(v4l2object->type)) < 0) {
+     GST_ELEMENT_ERROR (v4l2object->element, RESOURCE, OPEN_READ,
+diff -ruaN ./gst-plugins-good-0.10.25/sys/v4l2/gstv4l2sink.c gst-plugins-good-0.10.25.mod/sys/v4l2/gstv4l2sink.c
+--- ./gst-plugins-good-0.10.25/sys/v4l2/gstv4l2sink.c	2010-09-03 02:22:25.000000000 +0800
++++ gst-plugins-good-0.10.25.mod/sys/v4l2/gstv4l2sink.c	2011-05-21 18:27:39.043359988 +0800
+@@ -37,6 +37,7 @@
+  */
+ 
+ 
++
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
+ #endif
+@@ -182,7 +183,8 @@
+     guint64 offset, guint size, GstCaps * caps, GstBuffer ** buf);
+ static GstFlowReturn gst_v4l2sink_show_frame (GstBaseSink * bsink,
+     GstBuffer * buf);
+-
++static GstFlowReturn gst_v4l2sink_preroll_frame (GstBaseSink * bsink,
++    GstBuffer * buf);
+ 
+ static void
+ gst_v4l2sink_base_init (gpointer g_class)
+@@ -249,7 +251,7 @@
+   basesink_class->get_caps = GST_DEBUG_FUNCPTR (gst_v4l2sink_get_caps);
+   basesink_class->set_caps = GST_DEBUG_FUNCPTR (gst_v4l2sink_set_caps);
+   basesink_class->buffer_alloc = GST_DEBUG_FUNCPTR (gst_v4l2sink_buffer_alloc);
+-  basesink_class->preroll = GST_DEBUG_FUNCPTR (gst_v4l2sink_show_frame);
++  basesink_class->preroll = GST_DEBUG_FUNCPTR (gst_v4l2sink_preroll_frame);
+   basesink_class->render = GST_DEBUG_FUNCPTR (gst_v4l2sink_show_frame);
+ }
+ 
+@@ -542,12 +544,13 @@
+   guint size;
+ 
+   LOG_CAPS (v4l2sink, caps);
++  printf("set_caps: ");
+ 
+   if (!GST_V4L2_IS_OPEN (v4l2sink->v4l2object)) {
+     GST_DEBUG_OBJECT (v4l2sink, "device is not open");
+     return FALSE;
+   }
+-
++#if 0 // steve , debug only
+   if (v4l2sink->current_caps) {
+     GST_DEBUG_OBJECT (v4l2sink, "already have caps set.. are they equal?");
+     LOG_CAPS (v4l2sink, v4l2sink->current_caps);
+@@ -569,7 +572,7 @@
+     GST_DEBUG_OBJECT (v4l2sink, "warning, changing caps not supported yet");
+     return FALSE;
+   }
+-
++#endif
+   /* we want our own v4l2 type of fourcc codes */
+   if (!gst_v4l2_object_get_caps_info (v4l2sink->v4l2object, caps,
+           &format, &w, &h, &fps_n, &fps_d, &size)) {
+@@ -577,10 +580,12 @@
+     return FALSE;
+   }
+ 
++
+   if (!format) {
+     GST_DEBUG_OBJECT (v4l2sink, "unrecognized caps!!");
+     return FALSE;
+   }
++  printf("format_fourcc<%08x>w<%d>h<%d>fps_n/fps_d<%d/%d>\n",format->pixelformat,w,h,fps_n,fps_d);
+ 
+   if (!gst_v4l2_object_set_format (v4l2sink->v4l2object, format->pixelformat, w,
+           h)) {
+@@ -602,6 +607,7 @@
+ {
+   GstV4l2Sink *v4l2sink = GST_V4L2SINK (bsink);
+   GstV4l2Buffer *v4l2buf;
++  GST_INFO_OBJECT (v4l2sink, "caps<%p>\n",caps);
+ 
+   if (v4l2sink->v4l2object->vcap.capabilities & V4L2_CAP_STREAMING) {
+ 
+@@ -634,11 +640,17 @@
+     v4l2buf = gst_v4l2_buffer_pool_get (v4l2sink->pool);
+ 
+     if (G_LIKELY (v4l2buf)) {
+-      GST_DEBUG_OBJECT (v4l2sink, "allocated buffer: %p", v4l2buf);
++      GST_INFO_OBJECT (v4l2sink, "allocated buffer: %p", v4l2buf);
++	  if (GST_BUFFER_SIZE (v4l2buf) > size) {
++	  	GST_BUFFER_SIZE (v4l2buf) = size;
++	  }
++
+       *buf = GST_BUFFER (v4l2buf);
++      printf( "<%d>:allocated buffer: <%p><%d><%d>ref[%d]\n",size, GST_BUFFER_DATA (v4l2buf),GST_BUFFER_SIZE (v4l2buf),v4l2buf->vbuffer.index,GST_MINI_OBJECT_REFCOUNT_VALUE (*buf));
+       return GST_FLOW_OK;
+     } else {
+-      GST_DEBUG_OBJECT (v4l2sink, "failed to allocate buffer");
++      GST_ERROR_OBJECT (v4l2sink, "failed to allocate buffer");
++      printf( "failed to allocate buffer\n");
+       return GST_FLOW_ERROR;
+     }
+ 
+@@ -647,7 +659,7 @@
+     return GST_FLOW_ERROR;
+   }
+ }
+-
++//struct timeval startTime;
+ /* called after A/V sync to render frame */
+ static GstFlowReturn
+ gst_v4l2sink_show_frame (GstBaseSink * bsink, GstBuffer * buf)
+@@ -656,10 +668,16 @@
+   GstBuffer *newbuf = NULL;
+ 
+   GST_DEBUG_OBJECT (v4l2sink, "render buffer: %p", buf);
+-
++/*
++struct timeval endTime;
++gettimeofday (&endTime, NULL);//start
++long results = (endTime.tv_sec - startTime.tv_sec) * 1000 + (endTime.tv_usec - startTime.tv_usec)/1000;
++startTime = endTime;
++*/
++ 
+   if (!GST_IS_V4L2_BUFFER (buf)) {
++printf("render_buf_a: <%p><%p>ref[%d]\n",GST_BUFFER_DATA (buf), buf,GST_MINI_OBJECT_REFCOUNT_VALUE (buf));
+     GstFlowReturn ret;
+-
+     GST_DEBUG_OBJECT (v4l2sink, "slow-path.. I got a %s so I need to memcpy",
+         g_type_name (G_OBJECT_TYPE (buf)));
+ 
+@@ -670,7 +688,6 @@
+     if (GST_FLOW_OK != ret) {
+       return ret;
+     }
+-
+     memcpy (GST_BUFFER_DATA (newbuf),
+         GST_BUFFER_DATA (buf),
+         MIN (GST_BUFFER_SIZE (newbuf), GST_BUFFER_SIZE (buf)));
+@@ -678,6 +695,8 @@
+     GST_DEBUG_OBJECT (v4l2sink, "render copied buffer: %p", newbuf);
+ 
+     buf = newbuf;
++  } else {
++printf("render_buf_b: <%p><%p>ref[%d]\n",GST_BUFFER_DATA (buf), buf,GST_MINI_OBJECT_REFCOUNT_VALUE (buf));  
+   }
+ 
+   if (!gst_v4l2_buffer_pool_qbuf (v4l2sink->pool, GST_V4L2_BUFFER (buf))) {
+@@ -713,3 +732,16 @@
+ 
+   return GST_FLOW_OK;
+ }
++/* called after A/V sync to preroll frame */
++static GstFlowReturn
++gst_v4l2sink_preroll_frame (GstBaseSink * bsink, GstBuffer * buf)
++{
++  GstV4l2Sink *v4l2sink = GST_V4L2SINK (bsink);
++  GstBuffer *newbuf = NULL;
++
++  GST_DEBUG_OBJECT (v4l2sink, "preroll buffer: %pref[%d]", buf,GST_MINI_OBJECT_REFCOUNT_VALUE (buf));
++
++printf("preroll_buf: <%p><%p>\n",GST_BUFFER_DATA (buf), buf);
++
++  return GST_FLOW_OK;
++}

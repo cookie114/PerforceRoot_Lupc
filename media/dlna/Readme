@@ -1,0 +1,5 @@
+1.libupnp
+export CFLAGS="-fPIC -EL -march=24kef2_1 -mtune=24kef2_1 -mdspr2"
+export LDFLAGS="-EL -march=24kef2_1 -mtune=24kef2_1 -mdspr2"
+./configure --host=mips-linux-gnu --enable-static --disable-shared
+2.gmediarender for x86, mips not use.

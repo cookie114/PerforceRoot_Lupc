@@ -1,0 +1,20 @@
+--- ./tmp/alsa-lib-1.0.23/include/iatomic.h	2010-04-16 19:11:05.000000000 +0800
++++ ./alsa-lib-1.0.23/include/iatomic.h	2010-12-01 11:21:39.317440517 +0800
+@@ -720,7 +720,7 @@
+  * Atomically adds @i to @v.  Note that the guaranteed useful range
+  * of an atomic_t is only 24 bits.
+  */
+-extern __inline__ void atomic_add(int i, atomic_t * v)
++static __inline__ void atomic_add(int i, atomic_t * v)
+ {
+ 	unsigned long temp;
+ 
+@@ -744,7 +744,7 @@
+  * Atomically subtracts @i from @v.  Note that the guaranteed
+  * useful range of an atomic_t is only 24 bits.
+  */
+-extern __inline__ void atomic_sub(int i, atomic_t * v)
++static __inline__ void atomic_sub(int i, atomic_t * v)
+ {
+ 	unsigned long temp;
+ 

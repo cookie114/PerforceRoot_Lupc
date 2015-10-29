@@ -1,0 +1,2 @@
+cd ffmpeg-2.0
+./configure --enable-cross-compile --cross-prefix=mips-linux-gnu- --target-os=linux --arch=mips --extra-cflags="-fPIC -EL -march=24kef2_1 -mtune=24kef2_1 -mdspr2" --extra-cxxflags="-fPIC -EL -march=24kef2_1 -mtune=24kef2_1 -mdspr2" --extra-ldflags="-fPIC -EL -march=24kef2_1 -mtune=24kef2_1 -mdspr2" --disable-everything --disable-programs --disable-ffmpeg --disable-ffplay --disable-ffprobe --disable-ffserver --disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages --disable-everything

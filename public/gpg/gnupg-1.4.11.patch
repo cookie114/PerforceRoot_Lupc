@@ -1,0 +1,11 @@
+--- ./tmp/gnupg-1.4.11/mpi/longlong.h	2010-06-01 19:01:46.000000000 +0800
++++ ./gnupg-1.4.11/mpi/longlong.h	2010-11-30 13:17:26.367597856 +0800
+@@ -710,7 +710,7 @@
+  **************  MIPS  *****************
+  ***************************************/
+ #if defined (__mips__) && W_TYPE_SIZE == 32
+-#if __GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR >= 4 )
++#if 1 //__GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR >= 4 )
+ #define umul_ppmm(w1, w0, u, v)                                         \
+   do {                                                                  \
+     UDItype __ll = (UDItype)(u) * (v);                                  \
